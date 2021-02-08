@@ -1,0 +1,350 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="CodeEditor">
+      <UniqueIdentifier>{34862024-e371-43b9-955d-e678b43f501e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TextEditor">
+      <UniqueIdentifier>{7a47e663-3eb0-43f9-b18c-d42b568eaa0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utilities">
+      <UniqueIdentifier>{f8fdcf3c-8693-412d-8a5b-dcab60ae275c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Utilities\Array.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\Stack.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\String.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\Caret.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\CaretController.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\CharacterMetrics.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\Characters.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\CNTCommandFactory.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\CNTCommands.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\CNTKeyActionFactory.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\CNTKeyActions.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\Composite.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\DrawingVisitor.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\DummyLine.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\DummyManager.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\FindReplaceDialog.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\Font.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\Glyph.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\GlyphFactory.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\HistoryBook.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\HScrollActionFactory.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\HScrollActions.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\Line.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\Note.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\Observer.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\resource.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\Scanner.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\Scroll.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\ScrollController.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\Selection.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\Subject.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\TextEditingForm.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\Visitor.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\VScrollActionFactory.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor\VScrollActions.h">
+      <Filter>TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\Book.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\CommandFactory.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\Commands.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\Document.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\FileDialog.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\FileFactory.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\FileManager.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\Files.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\PageSetupDialog.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\PreviewForm.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\Printer.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\PrintInformation.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\PrintingVisitor.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\PrintJobManager.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\PrintStateDialog.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\resource.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\CodeEditingForm.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\CodeEditorApp.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\ConsoleForm.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Utilities\Stack.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities\String.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\Caret.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\CaretController.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\CharacterMetrics.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\Characters.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\CNTCommandFactory.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\CNTCommands.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\CNTKeyActionFactory.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\CNTKeyActions.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\Composite.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\DrawingVisitor.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\DummyLine.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\DummyManager.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\FindReplaceDialog.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\Font.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\Glyph.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\GlyphFactory.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\HistoryBook.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\HScrollActionFactory.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\HScrollActions.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\Line.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\Note.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\Observer.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\Scanner.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\Scroll.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\ScrollController.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\Selection.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\Subject.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\TextEditingForm.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\Visitor.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\VScrollActionFactory.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor\VScrollActions.cpp">
+      <Filter>TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\Book.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\CommandFactory.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\Commands.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\Document.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\FileDialog.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\FileFactory.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\FileManager.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\Files.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\PageSetupDialog.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\PreviewForm.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\Printer.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\PrintInformation.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\PrintingVisitor.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\PrintJobManager.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\PrintStateDialog.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\CodeEditingForm.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\CodeEditorApp.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\ConsoleForm.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="CodeEditor\Notepad20190501.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="TextEditor\TextEditingForm.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="CodeEditor\bmp00001.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+</Project>
