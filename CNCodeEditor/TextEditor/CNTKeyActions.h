@@ -394,4 +394,14 @@ public:
 	CNTCtrlF3KeyAction& operator =(const CNTCtrlF3KeyAction& source);
 };
 
+//CNTCtrlF5KeyAction
+class CNTCtrlF5KeyAction : public CNTKeyAction {
+public:
+	CNTCtrlF5KeyAction(TextEditingForm* textEditingForm = 0);
+	CNTCtrlF5KeyAction(const CNTCtrlF5KeyAction& source);
+	virtual ~CNTCtrlF5KeyAction();
+	virtual void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+	CNTCtrlF5KeyAction& operator =(const CNTCtrlF5KeyAction& source);
+};
+
 #endif //_CNTKEYACTIONS_H

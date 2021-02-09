@@ -974,3 +974,29 @@ CNTCtrlF3KeyAction& CNTCtrlF3KeyAction::operator =(const CNTCtrlF3KeyAction& sou
 void CNTCtrlF3KeyAction::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) {
 	this->textEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_FLAG_UNLOCKFINDREPLACEDIALOG, 0));
 }
+
+//CNTCtrlF5KeyAction
+CNTCtrlF5KeyAction::CNTCtrlF5KeyAction(TextEditingForm* textEditingForm)
+	: CNTKeyAction(textEditingForm) {
+
+}
+
+CNTCtrlF5KeyAction::CNTCtrlF5KeyAction(const CNTCtrlF5KeyAction& source)
+	: CNTKeyAction(source) {
+
+}
+
+CNTCtrlF5KeyAction::~CNTCtrlF5KeyAction() {
+
+}
+
+CNTCtrlF5KeyAction& CNTCtrlF5KeyAction::operator =(const CNTCtrlF5KeyAction& source) {
+	CNTKeyAction::operator=(source);
+
+	return *this;
+}
+
+void CNTCtrlF5KeyAction::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) {
+	CodeEditingForm* codeEditingForm = (CodeEditingForm*)this->textEditingForm->GetParent();
+	codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDM_EXECUTE_C, 0));
+}

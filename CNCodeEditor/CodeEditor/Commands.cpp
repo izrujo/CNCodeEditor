@@ -946,9 +946,26 @@ void CCompileCommand::Execute() {
 	system(cmd.c_str());*/
 
 	string pathName = this->codeEditingForm->document->GetPathName();
-	string cmd = "gcc -c ";
-	cmd += pathName;
-	cmd += " > outTemp.txt 2>&1";
+	string fileName = pathName;
+	Long i = fileName.length();
+	char character = fileName.at(i - 1);
+	while (i > 0 && character != '\\') {
+		character = fileName.at(--i);
+	}
+	fileName = fileName.erase(0, i+1);
+	
+	string exeName = fileName;
+	i = exeName.length();
+	character = exeName.at(i - 1);
+	while (i > 0 && character != '.') {
+		character = exeName.at(--i);
+	}
+	exeName = exeName.erase(i);
+
+	string cmd = "gcc -o " + exeName + " " + pathName; //컴파일, 링크
+	system(cmd.c_str());
+
+	cmd = exeName + " > outTemp.txt 2>&1"; //적재 다음에 할 일.
 	system(cmd.c_str());
 
 	//저장한 결과를 가져온다.
@@ -965,7 +982,7 @@ void CCompileCommand::Execute() {
 
 	this->codeEditingForm->document->SetPathName(pathName);
 
-	ConsoleForm* consoleForm = new ConsoleForm(this->codeEditingForm, result);
+	ConsoleForm* consoleForm = new ConsoleForm(this->codeEditingForm, result, exeName);
 	consoleForm->Create(NULL, "디버그 콘솔");
 	consoleForm->ShowWindow(SW_SHOW);
 	consoleForm->UpdateWindow();

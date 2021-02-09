@@ -120,6 +120,9 @@ CNTKeyAction* CNTKeyActionFactory::Make(UINT nChar) {
 	else if (isCtrl && nChar == 0x72) {// 임시
 		keyAction = new CNTCtrlF3KeyAction(this->textEditingForm);
 	}
+	else if (isCtrl && nChar == 0x74) {// 임시
+		keyAction = new CNTCtrlF5KeyAction(this->textEditingForm);
+	}
 	//KEY
 	else if (nChar == VK_LEFT) {
 		keyAction = new CNTLeftKeyAction(this->textEditingForm);
