@@ -17,11 +17,10 @@ BEGIN_MESSAGE_MAP(ConsoleForm, CFrameWnd)
 	ON_WM_KILLFOCUS()
 END_MESSAGE_MAP()
 
-ConsoleForm::ConsoleForm(CWnd* parent, string result, string exeName) {
+ConsoleForm::ConsoleForm(CWnd* parent, string result) {
 	this->parent = parent;
 	this->textEditingForm = NULL;
 	this->result = result;
-	this->exeName = exeName;
 }
 
 int ConsoleForm::OnCreate(LPCREATESTRUCT lpCreateStruct) {
@@ -67,10 +66,7 @@ void ConsoleForm::OnClose() {
 		delete this->textEditingForm;
 		this->textEditingForm = NULL;
 	}
-	//exe파일 지워주기
-	string cmd = "del " + this->exeName + ".exe";
-	system(cmd.c_str());
-	cmd = "del outTemp.txt";
+	string cmd = "del temp\\outTemp.txt";
 	system(cmd.c_str());
 
 	CFrameWnd::OnClose();

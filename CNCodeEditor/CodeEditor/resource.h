@@ -22,7 +22,9 @@
 #define IDM_EDIT_REPLACE                10029
 #define IDM_FORMAT_FONT                 10031
 #define IDM_FILE_CLOSE                  10090
-#define IDM_EXECUTE_C                   10098
+#define IDM_C_COMPILE                   10096
+#define IDM_C_LINK                      10097
+#define IDM_C_LOAD                      10098
 #define IDC_REPORT_DIRTY                10099
 #define IDR_TOOLBAR1                    11000
 #define IDT_BUTTON_PRINT                11001
@@ -45,7 +47,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        127
-#define _APS_NEXT_COMMAND_VALUE         40075
+#define _APS_NEXT_COMMAND_VALUE         40081
 #define _APS_NEXT_CONTROL_VALUE         1007
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

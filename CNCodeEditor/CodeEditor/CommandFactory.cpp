@@ -80,8 +80,14 @@ Command* CommandFactory::Make(int uID) {
 	else if (uID == IDC_REPORT_DIRTY) {
 		command = new ReportDirtyCommand(this->codeEditingForm);
 	}
-	else if (uID == IDM_EXECUTE_C) {
+	else if (uID == IDM_C_COMPILE) {
 		command = new CCompileCommand(this->codeEditingForm);
+	}
+	else if (uID == IDM_C_LINK) {
+		command = new CLinkCommand(this->codeEditingForm);
+	}
+	else if (uID == IDM_C_LOAD) {
+		command = new CLoadCommand(this->codeEditingForm);
 	}
 
 	return command;

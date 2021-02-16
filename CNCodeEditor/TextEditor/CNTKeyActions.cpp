@@ -998,5 +998,5 @@ CNTCtrlF5KeyAction& CNTCtrlF5KeyAction::operator =(const CNTCtrlF5KeyAction& sou
 
 void CNTCtrlF5KeyAction::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) {
 	CodeEditingForm* codeEditingForm = (CodeEditingForm*)this->textEditingForm->GetParent();
-	codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDM_EXECUTE_C, 0));
+	codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDM_C_LOAD, 0));
 }

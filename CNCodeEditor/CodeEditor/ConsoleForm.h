@@ -11,7 +11,7 @@ class TextEditingForm;
 
 class ConsoleForm : public CFrameWnd {
 public:
-	ConsoleForm(CWnd* parent = NULL, string result = 0, string exeName = 0);
+	ConsoleForm(CWnd* parent = NULL, string result = 0);
 	virtual int OnCreate(LPCREATESTRUCT lpCreateStruct);
 
 protected:
@@ -25,7 +25,6 @@ public:
 	CWnd* parent;
 	TextEditingForm* textEditingForm;
 	string result;
-	string exeName;
 };
 
 #endif //_CONSOLEFORM_H

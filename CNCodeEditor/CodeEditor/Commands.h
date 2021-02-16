@@ -297,4 +297,30 @@ public:
 	virtual Command* Clone();
 };
 
+//CLinkCommand
+class CLinkCommand : public Command {
+public:
+	CLinkCommand(CodeEditingForm* codeEditingForm = 0);
+	CLinkCommand(const CLinkCommand& source);
+	virtual ~CLinkCommand();
+	CLinkCommand& operator=(const CLinkCommand& source);
+
+	virtual void Execute();
+	virtual string GetType();
+	virtual Command* Clone();
+};
+
+//CLoadCommand
+class CLoadCommand : public Command {
+public:
+	CLoadCommand(CodeEditingForm* codeEditingForm = 0);
+	CLoadCommand(const CLoadCommand& source);
+	virtual ~CLoadCommand();
+	CLoadCommand& operator=(const CLoadCommand& source);
+
+	virtual void Execute();
+	virtual string GetType();
+	virtual Command* Clone();
+};
+
 #endif //_COMMAND_H

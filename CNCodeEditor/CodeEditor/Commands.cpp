@@ -11,6 +11,7 @@
 #include "Printer.h"
 #include "PrintJobManager.h"
 #include "Files.h"
+#include "FileFactory.h"
 #include "ConsoleForm.h"
 #include "../TextEditor/TextEditingForm.h"
 #include "../TextEditor/Font.h"
@@ -946,31 +947,11 @@ void CCompileCommand::Execute() {
 	system(cmd.c_str());*/
 
 	string pathName = this->codeEditingForm->document->GetPathName();
-	string fileName = pathName;
-	Long i = fileName.length();
-	char character = fileName.at(i - 1);
-	while (i > 0 && character != '\\') {
-		character = fileName.at(--i);
-	}
-	fileName = fileName.erase(0, i+1);
-	
-	string exeName = fileName;
-	i = exeName.length();
-	character = exeName.at(i - 1);
-	while (i > 0 && character != '.') {
-		character = exeName.at(--i);
-	}
-	exeName = exeName.erase(i);
-
-	string cmd = "gcc -o " + exeName + " " + pathName; //컴파일, 링크
+	string cmd = "gcc -c " + pathName + " > temp\\outTemp.txt 2>&1"; //컴파일
 	system(cmd.c_str());
 
-	cmd = exeName + " > outTemp.txt 2>&1"; //적재 다음에 할 일.
-	system(cmd.c_str());
-
-	//저장한 결과를 가져온다.
 	int message;
-	string resultFileName = "outTemp.txt";
+	string resultFileName = "temp\\outTemp.txt";
 
 	File* file = new AnsiFile(resultFileName); //FileFactory::MakeOpenFile에 오류가 있는 것 같다.ansi인데 utf16le로 읽어냄.
 	this->codeEditingForm->document->SetEncodingType(file->GetType());
@@ -982,7 +963,7 @@ void CCompileCommand::Execute() {
 
 	this->codeEditingForm->document->SetPathName(pathName);
 
-	ConsoleForm* consoleForm = new ConsoleForm(this->codeEditingForm, result, exeName);
+	ConsoleForm* consoleForm = new ConsoleForm(this->codeEditingForm, result);
 	consoleForm->Create(NULL, "디버그 콘솔");
 	consoleForm->ShowWindow(SW_SHOW);
 	consoleForm->UpdateWindow();
@@ -994,4 +975,213 @@ string CCompileCommand::GetType() {
 
 Command* CCompileCommand::Clone() {
 	return new CCompileCommand(*this);
+}
+
+//CLinkCommand
+CLinkCommand::CLinkCommand(CodeEditingForm* codeEditingForm)
+	: Command(codeEditingForm) {
+}
+
+CLinkCommand::CLinkCommand(const CLinkCommand& source)
+	: Command(source) {
+}
+
+CLinkCommand::~CLinkCommand() {
+
+}
+
+CLinkCommand& CLinkCommand::operator=(const CLinkCommand& source) {
+	Command::operator=(source);
+
+	return *this;
+}
+
+void CLinkCommand::Execute() {
+	//컴파일 안했으면 컴파일도.
+	//gcc -o filename.o
+
+	string pathName = this->codeEditingForm->document->GetPathName();
+
+	String fileName(pathName);
+	Long index = fileName.ReversedFind('\\');
+	fileName.Delete(0, index + 1);
+	char extension1[3] = ".c";
+	char extension2[3] = ".o";
+	char extension3[5] = ".exe";
+	fileName.Replace(extension1, extension2);
+	string objectName = fileName.GetString();
+	fileName.Replace(extension2, extension3);
+	string exeName = fileName.GetString();
+	string cmd = "gcc -o " + exeName + " " + objectName + " > temp\\outTemp.txt 2>&1";
+	system(cmd.c_str());
+
+	cmd = "del " + objectName;
+	system(cmd.c_str());
+
+	int message;
+	string resultFileName = "temp\\outTemp.txt";
+
+	File* file = new AnsiFile(resultFileName); //FileFactory::MakeOpenFile에 오류가 있는 것 같다.ansi인데 utf16le로 읽어냄.
+	this->codeEditingForm->document->SetEncodingType(file->GetType());
+	string result = file->Load();
+
+	if (file != 0) {
+		delete file;
+	}
+
+	this->codeEditingForm->document->SetPathName(pathName);
+
+	ConsoleForm* consoleForm = new ConsoleForm(this->codeEditingForm, result);
+	consoleForm->Create(NULL, "디버그 콘솔");
+	consoleForm->ShowWindow(SW_SHOW);
+	consoleForm->UpdateWindow();
+}
+
+string CLinkCommand::GetType() {
+	return "CLink";
+}
+
+Command* CLinkCommand::Clone() {
+	return new CLinkCommand(*this);
+}
+
+//CLoadCommand
+CLoadCommand::CLoadCommand(CodeEditingForm* codeEditingForm)
+	: Command(codeEditingForm) {
+}
+
+CLoadCommand::CLoadCommand(const CLoadCommand& source)
+	: Command(source) {
+}
+
+CLoadCommand::~CLoadCommand() {
+
+}
+
+CLoadCommand& CLoadCommand::operator=(const CLoadCommand& source) {
+	Command::operator=(source);
+
+	return *this;
+}
+
+void CLoadCommand::Execute() {
+	//링크 안했으면 링크도.
+	//CreateProcess(filename.exe);
+
+	string pathName = this->codeEditingForm->document->GetPathName();
+
+	String fileName(pathName);
+	Long location = fileName.ReversedFind('\\');
+	fileName.Delete(0, location + 1);
+	char extension1[3] = ".c";
+	char extension3[5] = ".exe";
+	fileName.Replace(extension1, extension3);
+	string exeName = fileName.GetString();
+
+	string tempDirectory = "temp\\";
+
+	//2.1. c 파일을 연다. full\\path\\filename.c
+	FileFactory fileFactory;
+	File* file = fileFactory.MakeOpenFile(pathName);
+	this->codeEditingForm->document->SetEncodingType(file->GetType());
+	string content = file->Load();
+	if (file != 0) {
+		delete file;
+	}
+
+	//2.2. 파일을 수정한다. temp\\CNTemp.c
+	//-main이 int로 시작하면 return 0;을 찾고 void면 가장 뒤의 }를 찾는다.
+	Long last = content.length();
+	Long index = content.find("main(");
+	Long rindex = content.rfind("int", index);
+	if (rindex != index) {
+		rindex = content.rfind("return 0;", last);
+	}
+	else {
+		rindex = content.rfind("}", last);
+	}
+	if (rindex != index) {
+		string additionalCodes = "printf(\"This process exited with code 0.\\n\");\n"
+			"printf(\"Press any key to close this window . . . \\n\");\n"
+			"getch();\n";
+		content.insert(rindex, additionalCodes);
+	}
+	//-찾은 곳 이전에 다음 문자열을 넣는다.
+	//printf("This process exited with code 0.\n");\n
+	//printf("Press any key to close this window . . . ");\n
+	//getch();\n
+	string tempSource = tempDirectory + "CNTemp.c";
+	file = fileFactory.MakeSaveFile(tempSource, this->codeEditingForm->document->GetEncodingType());
+	file->Save(content);
+	if (file != 0) {
+		delete file;
+	}
+
+	//2.3. 수정한 파일을 컴파일한다. temp\\CNTemp.exe
+	string tempExe = tempDirectory + "CNTemp.exe";
+	string cmd = "gcc -o " + tempExe + " " + tempSource; //컴파일, 링크
+	system(cmd.c_str());
+
+	//2.4. 수정한 exe를 실행한다.
+	//4. Process
+	TCHAR szCmdline[] = TEXT("ChildProcess");
+	PROCESS_INFORMATION piProcInfo;
+	STARTUPINFO siStartInfo;
+	BOOL bSuccess = FALSE;
+
+	// Set up members of the PROCESS_INFORMATION structure. 
+
+	ZeroMemory(&piProcInfo, sizeof(PROCESS_INFORMATION));
+
+	// Set up members of the STARTUPINFO structure. 
+	// This structure specifies the STDIN and STDOUT handles for redirection.
+
+	ZeroMemory(&siStartInfo, sizeof(STARTUPINFO));
+	siStartInfo.cb = sizeof(STARTUPINFO);
+	siStartInfo.hStdError = NULL;
+	siStartInfo.hStdOutput = NULL;
+	siStartInfo.hStdInput = NULL;
+	siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
+	siStartInfo.lpTitle = (LPSTR)"디버그 콘솔";
+
+	bSuccess = CreateProcess(tempExe.c_str(),
+		szCmdline,      // command line 
+		NULL,          // process security attributes 
+		NULL,          // primary thread security attributes 
+		TRUE,          // handles are inherited 
+		CREATE_NEW_CONSOLE,             // creation flags 
+		NULL,          // use parent's environment 
+		NULL,          // use parent's current directory 
+		&siStartInfo,  // STARTUPINFO pointer 
+		&piProcInfo);  // receives PROCESS_INFORMATION 
+
+	 // If an error occurs, exit the application. 
+	if (!bSuccess) {
+	}
+	else
+	{
+		// Close handles to the child process and its primary thread.
+		// Some applications might keep these handles to monitor the status
+		// of the child process, for example.
+		CloseHandle(piProcInfo.hProcess);
+		CloseHandle(piProcInfo.hThread);
+
+		// Close handles to the stdin and stdout pipes no longer needed by the child process.
+		// If they are not explicitly closed, there is no way to recognize that the child process has ended.
+	}
+	//2.5. 프로세스가 종료되면 수정한 c와 exe를 삭제한다.
+	cmd = "del " + tempSource;
+	system(cmd.c_str());
+	cmd = "del " + tempExe;
+	system(cmd.c_str());
+	cmd = "del " + exeName;
+	system(cmd.c_str());
+}
+
+string CLoadCommand::GetType() {
+	return "CLoad";
+}
+
+Command* CLoadCommand::Clone() {
+	return new CLoadCommand(*this);
 }
