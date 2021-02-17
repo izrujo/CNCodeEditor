@@ -12,6 +12,7 @@ class TextEditingForm;
 class Document;
 class PrintJobManager;
 class PrintStateDialog;
+class OutputForm;
 
 class CodeEditingForm : public CFrameWnd {
 public:
@@ -23,6 +24,7 @@ public:
 	Document* document;
 	PrintJobManager* printJobManager;
 	PrintStateDialog* printStateDialog;
+	OutputForm* outputForm;
 
 protected:
 	afx_msg void OnClose();
@@ -36,6 +38,30 @@ protected:
 	//afx_msg void OnUpdateCommandUIRange(CCmdUI *pCmdUI);
 	DECLARE_MESSAGE_MAP()
 
+public:
+	BOOL GetIsCompiled() const;
+	void SetIsCompiled(BOOL isCompiled);
+	BOOL GetIsLinked() const;
+	void SetIsLinked(BOOL isLinked);
+private:
+	BOOL isCompiled;
+	BOOL isLinked;
 };
+
+inline BOOL CodeEditingForm::GetIsCompiled() const {
+	return this->isCompiled;
+}
+
+inline void CodeEditingForm::SetIsCompiled(BOOL isCompiled) {
+	this->isCompiled = isCompiled;
+}
+
+inline BOOL CodeEditingForm::GetIsLinked() const {
+	return this->isLinked;
+}
+
+inline void CodeEditingForm::SetIsLinked(BOOL isLinked) {
+	this->isLinked = isLinked;
+}
 
 #endif //_CODEEDITINGFORM_H

@@ -144,7 +144,8 @@
     <ClInclude Include="CodeEditor\Book.h" />
     <ClInclude Include="CodeEditor\CommandFactory.h" />
     <ClInclude Include="CodeEditor\Commands.h" />
-    <ClInclude Include="CodeEditor\ConsoleForm.h" />
+    <ClInclude Include="CodeEditor\GraphVisitors.h" />
+    <ClInclude Include="CodeEditor\OutputForm.h" />
     <ClInclude Include="CodeEditor\Document.h" />
     <ClInclude Include="CodeEditor\FileDialog.h" />
     <ClInclude Include="CodeEditor\FileFactory.h" />
@@ -160,6 +161,8 @@
     <ClInclude Include="CodeEditor\PrintJobManager.h" />
     <ClInclude Include="CodeEditor\PrintStateDialog.h" />
     <ClInclude Include="CodeEditor\resource.h" />
+    <ClInclude Include="CodeEditor\UIGraphFactory.h" />
+    <ClInclude Include="CodeEditor\UIGraphs.h" />
     <ClInclude Include="TextEditor\Caret.h" />
     <ClInclude Include="TextEditor\CaretController.h" />
     <ClInclude Include="TextEditor\CharacterMetrics.h" />
@@ -200,7 +203,8 @@
     <ClCompile Include="CodeEditor\Book.cpp" />
     <ClCompile Include="CodeEditor\CommandFactory.cpp" />
     <ClCompile Include="CodeEditor\Commands.cpp" />
-    <ClCompile Include="CodeEditor\ConsoleForm.cpp" />
+    <ClCompile Include="CodeEditor\GraphVisitors.cpp" />
+    <ClCompile Include="CodeEditor\OutputForm.cpp" />
     <ClCompile Include="CodeEditor\Document.cpp" />
     <ClCompile Include="CodeEditor\FileDialog.cpp" />
     <ClCompile Include="CodeEditor\FileFactory.cpp" />
@@ -215,6 +219,8 @@
     <ClCompile Include="CodeEditor\PrintingVisitor.cpp" />
     <ClCompile Include="CodeEditor\PrintJobManager.cpp" />
     <ClCompile Include="CodeEditor\PrintStateDialog.cpp" />
+    <ClCompile Include="CodeEditor\UIGraphFactory.cpp" />
+    <ClCompile Include="CodeEditor\UIGraphs.cpp" />
     <ClCompile Include="TextEditor\Caret.cpp" />
     <ClCompile Include="TextEditor\CaretController.cpp" />
     <ClCompile Include="TextEditor\CharacterMetrics.cpp" />

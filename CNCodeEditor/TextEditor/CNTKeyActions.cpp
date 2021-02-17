@@ -1000,3 +1000,29 @@ void CNTCtrlF5KeyAction::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) {
 	CodeEditingForm* codeEditingForm = (CodeEditingForm*)this->textEditingForm->GetParent();
 	codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDM_C_LOAD, 0));
 }
+
+//CNTCtrlF7KeyAction
+CNTCtrlF7KeyAction::CNTCtrlF7KeyAction(TextEditingForm* textEditingForm)
+	: CNTKeyAction(textEditingForm) {
+
+}
+
+CNTCtrlF7KeyAction::CNTCtrlF7KeyAction(const CNTCtrlF7KeyAction& source)
+	: CNTKeyAction(source) {
+
+}
+
+CNTCtrlF7KeyAction::~CNTCtrlF7KeyAction() {
+
+}
+
+CNTCtrlF7KeyAction& CNTCtrlF7KeyAction::operator =(const CNTCtrlF7KeyAction& source) {
+	CNTKeyAction::operator=(source);
+
+	return *this;
+}
+
+void CNTCtrlF7KeyAction::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) {
+	CodeEditingForm* codeEditingForm = (CodeEditingForm*)this->textEditingForm->GetParent();
+	codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDM_C_COMPILE, 0));
+}

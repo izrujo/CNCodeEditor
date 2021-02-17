@@ -4,6 +4,7 @@
 #include "Document.h"
 #include "PrintJobManager.h"
 #include "PrintStateDialog.h"
+#include "OutputForm.h"
 #include "../TextEditor/TextEditingForm.h"
 #include "../TextEditor/Glyph.h"
 #include "../TextEditor/CharacterMetrics.h"
@@ -36,6 +37,10 @@ CodeEditingForm::CodeEditingForm() {
 	this->document = NULL;
 	this->printJobManager = NULL;
 	this->printStateDialog = NULL;
+	this->outputForm = NULL;
+
+	this->isCompiled = FALSE;
+	this->isLinked = FALSE;
 }
 
 int CodeEditingForm::OnCreate(LPCREATESTRUCT lpCreateStruct) {
@@ -64,6 +69,10 @@ int CodeEditingForm::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 }
 
 void CodeEditingForm::OnClose() {
+	if (this->outputForm != NULL) {
+		this->outputForm->SendMessage(WM_CLOSE);
+		delete this->outputForm;
+	}
 	if (this->textEditingForm != NULL) {
 		delete this->textEditingForm;
 		this->textEditingForm = NULL;
@@ -86,6 +95,12 @@ void CodeEditingForm::OnSize(UINT nType, int cx, int cy) {
 	this->GetClientRect(rect);
 
 	if (this->textEditingForm != NULL) {
+		if (this->outputForm != NULL) {
+			CRect outputRect = rect;
+			outputRect.top += (outputRect.Height() / 4) * 3;
+			this->outputForm->MoveWindow(outputRect);
+			rect.bottom = outputRect.top;
+		}
 		this->textEditingForm->MoveWindow(rect);
 	}
 
@@ -94,7 +109,9 @@ void CodeEditingForm::OnSize(UINT nType, int cx, int cy) {
 
 void CodeEditingForm::OnSetFocus(CWnd* pOldWnd) {
 	CFrameWnd::OnSetFocus(pOldWnd);
-	this->textEditingForm->SetFocus();
+	if (this->textEditingForm != NULL) {
+		this->textEditingForm->SetFocus();
+	}
 }
 
 void CodeEditingForm::OnKillFocus(CWnd* pNewWnd) {

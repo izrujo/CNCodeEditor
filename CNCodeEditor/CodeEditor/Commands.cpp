@@ -12,7 +12,7 @@
 #include "PrintJobManager.h"
 #include "Files.h"
 #include "FileFactory.h"
-#include "ConsoleForm.h"
+#include "OutputForm.h"
 #include "../TextEditor/TextEditingForm.h"
 #include "../TextEditor/Font.h"
 #include "../TextEditor/CharacterMetrics.h"
@@ -940,6 +940,15 @@ void CCompileCommand::Execute() {
 	//현재 파일 자동 저장해야함. 실행 전에.
 	this->codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDM_FILE_SAVE, 0));
 
+	if (this->codeEditingForm->outputForm != NULL) {
+		this->codeEditingForm->outputForm->SendMessage(WM_CLOSE);
+		delete this->codeEditingForm->outputForm;
+		this->codeEditingForm->outputForm = NULL;
+	}
+	CRect rect;
+	this->codeEditingForm->GetClientRect(rect);
+	this->codeEditingForm->textEditingForm->MoveWindow(rect);
+
 	//tcc 컴파일러를 이용해 현재 파일을(C 소스 파일임을 전제) 컴파일하고 그 결과를 저장한다.
 	/*string cmd = ".\\tcc\\tcc -run ";
 	cmd += this->codeEditingForm->document->GetPathName();
@@ -947,15 +956,32 @@ void CCompileCommand::Execute() {
 	system(cmd.c_str());*/
 
 	string pathName = this->codeEditingForm->document->GetPathName();
-	string cmd = "gcc -c " + pathName + " > temp\\outTemp.txt 2>&1"; //컴파일
+
+	String fileName(pathName);
+	Long index = fileName.ReversedFind('\\');
+	fileName.Delete(0, index + 1);
+	char extension1[3] = ".c";
+	char extension2[3] = ".o";
+	fileName.Replace(extension1, extension2);
+	string objectName = fileName.GetString();
+	string cmd = "del " + objectName;
 	system(cmd.c_str());
 
-	int message;
-	string resultFileName = "temp\\outTemp.txt";
+	string resultFileName = "temp\\CompileResult.txt";
+
+	cmd = "gcc -c " + pathName + " > " + resultFileName + " 2>&1"; //컴파일
+	system(cmd.c_str());
 
 	File* file = new AnsiFile(resultFileName); //FileFactory::MakeOpenFile에 오류가 있는 것 같다.ansi인데 utf16le로 읽어냄.
 	this->codeEditingForm->document->SetEncodingType(file->GetType());
 	string result = file->Load();
+	index = result.find("error");
+	if (index == -1) {
+		result += "\r\nCompile Succeed.\r\n";
+	}
+	else {
+		result += "\r\nCompile Failed.\r\n";
+	}
 
 	if (file != 0) {
 		delete file;
@@ -963,10 +989,21 @@ void CCompileCommand::Execute() {
 
 	this->codeEditingForm->document->SetPathName(pathName);
 
-	ConsoleForm* consoleForm = new ConsoleForm(this->codeEditingForm, result);
-	consoleForm->Create(NULL, "디버그 콘솔");
-	consoleForm->ShowWindow(SW_SHOW);
-	consoleForm->UpdateWindow();
+	this->codeEditingForm->GetClientRect(rect);
+	CRect outputRect = rect;
+	outputRect.top += (outputRect.Height() / 4) * 3;
+	rect.bottom = outputRect.top;
+
+	this->codeEditingForm->textEditingForm->MoveWindow(rect);
+
+	this->codeEditingForm->outputForm = new OutputForm(this->codeEditingForm, result, resultFileName);
+	this->codeEditingForm->outputForm->Create(NULL, "Output", WS_CHILD,
+		outputRect, this->codeEditingForm, NULL, NULL);
+	this->codeEditingForm->outputForm->ShowWindow(SW_SHOW);
+	this->codeEditingForm->outputForm->UpdateWindow();
+
+	this->codeEditingForm->SetIsCompiled(TRUE);
+	this->codeEditingForm->SetIsLinked(FALSE);
 }
 
 string CCompileCommand::GetType() {
@@ -1012,18 +1049,23 @@ void CLinkCommand::Execute() {
 	string objectName = fileName.GetString();
 	fileName.Replace(extension2, extension3);
 	string exeName = fileName.GetString();
-	string cmd = "gcc -o " + exeName + " " + objectName + " > temp\\outTemp.txt 2>&1";
+	string resultFileName = "temp\\LinkResult.txt";
+
+	string cmd = "gcc -o " + exeName + " " + objectName + " > " + resultFileName + " 2>&1";
 	system(cmd.c_str());
 
 	cmd = "del " + objectName;
 	system(cmd.c_str());
 
-	int message;
-	string resultFileName = "temp\\outTemp.txt";
-
 	File* file = new AnsiFile(resultFileName); //FileFactory::MakeOpenFile에 오류가 있는 것 같다.ansi인데 utf16le로 읽어냄.
 	this->codeEditingForm->document->SetEncodingType(file->GetType());
 	string result = file->Load();
+	if (result.length() < 1) {
+		result += "\r\nLink Succeed.\r\n";
+	}
+	else {
+		result += "\r\nLink Failed.\r\n";
+	}
 
 	if (file != 0) {
 		delete file;
@@ -1031,10 +1073,26 @@ void CLinkCommand::Execute() {
 
 	this->codeEditingForm->document->SetPathName(pathName);
 
-	ConsoleForm* consoleForm = new ConsoleForm(this->codeEditingForm, result);
-	consoleForm->Create(NULL, "디버그 콘솔");
-	consoleForm->ShowWindow(SW_SHOW);
-	consoleForm->UpdateWindow();
+	if (this->codeEditingForm->outputForm == NULL) {
+		CRect rect;
+		this->codeEditingForm->GetClientRect(rect);
+		CRect outputRect = rect;
+		outputRect.top += (outputRect.Height() / 4) * 3;
+		rect.bottom = outputRect.top;
+
+		this->codeEditingForm->textEditingForm->MoveWindow(rect);
+
+		this->codeEditingForm->outputForm = new OutputForm(this->codeEditingForm, result, resultFileName);
+		this->codeEditingForm->outputForm->Create(NULL, "Output", WS_CHILD,
+			outputRect, this->codeEditingForm, NULL, NULL);
+		this->codeEditingForm->outputForm->ShowWindow(SW_SHOW);
+		this->codeEditingForm->outputForm->UpdateWindow();
+	}
+	else {
+		this->codeEditingForm->outputForm->AppendResult(result, resultFileName);
+	}
+
+	this->codeEditingForm->SetIsLinked(TRUE);
 }
 
 string CLinkCommand::GetType() {
@@ -1065,18 +1123,14 @@ CLoadCommand& CLoadCommand::operator=(const CLoadCommand& source) {
 }
 
 void CLoadCommand::Execute() {
-	//링크 안했으면 링크도.
-	//CreateProcess(filename.exe);
+	if (this->codeEditingForm->GetIsCompiled() == FALSE) {
+		this->codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDM_C_COMPILE, 0));
+	}
+	if (this->codeEditingForm->GetIsLinked() == FALSE) {
+		this->codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDM_C_LINK, 0));
+	}
 
 	string pathName = this->codeEditingForm->document->GetPathName();
-
-	String fileName(pathName);
-	Long location = fileName.ReversedFind('\\');
-	fileName.Delete(0, location + 1);
-	char extension1[3] = ".c";
-	char extension3[5] = ".exe";
-	fileName.Replace(extension1, extension3);
-	string exeName = fileName.GetString();
 
 	string tempDirectory = "temp\\";
 
@@ -1119,63 +1173,77 @@ void CLoadCommand::Execute() {
 
 	//2.3. 수정한 파일을 컴파일한다. temp\\CNTemp.exe
 	string tempExe = tempDirectory + "CNTemp.exe";
-	string cmd = "gcc -o " + tempExe + " " + tempSource; //컴파일, 링크
+	string tempResult = tempDirectory + "TempResult.txt";
+	string cmd = "gcc -o " + tempExe + " " + tempSource + " > " + tempResult + " 2>&1"; //컴파일, 링크
 	system(cmd.c_str());
 
-	//2.4. 수정한 exe를 실행한다.
-	//4. Process
-	TCHAR szCmdline[] = TEXT("ChildProcess");
-	PROCESS_INFORMATION piProcInfo;
-	STARTUPINFO siStartInfo;
-	BOOL bSuccess = FALSE;
-
-	// Set up members of the PROCESS_INFORMATION structure. 
-
-	ZeroMemory(&piProcInfo, sizeof(PROCESS_INFORMATION));
-
-	// Set up members of the STARTUPINFO structure. 
-	// This structure specifies the STDIN and STDOUT handles for redirection.
-
-	ZeroMemory(&siStartInfo, sizeof(STARTUPINFO));
-	siStartInfo.cb = sizeof(STARTUPINFO);
-	siStartInfo.hStdError = NULL;
-	siStartInfo.hStdOutput = NULL;
-	siStartInfo.hStdInput = NULL;
-	siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
-	siStartInfo.lpTitle = (LPSTR)"디버그 콘솔";
-
-	bSuccess = CreateProcess(tempExe.c_str(),
-		szCmdline,      // command line 
-		NULL,          // process security attributes 
-		NULL,          // primary thread security attributes 
-		TRUE,          // handles are inherited 
-		CREATE_NEW_CONSOLE,             // creation flags 
-		NULL,          // use parent's environment 
-		NULL,          // use parent's current directory 
-		&siStartInfo,  // STARTUPINFO pointer 
-		&piProcInfo);  // receives PROCESS_INFORMATION 
-
-	 // If an error occurs, exit the application. 
-	if (!bSuccess) {
+	//tempResult를 읽어서 'error'가 없으면(warning은 허용) 컴파일/링크에 성공한 것이므로 실행한다. 
+	//그렇지 않으면 오류이므로 실행하지 않는다.
+	//ChildProcess가 실행될 동안 tempExe파일을 제거할 수 없어 이런 방식을 취한다.
+	file = fileFactory.MakeOpenFile(tempResult);
+	this->codeEditingForm->document->SetEncodingType(file->GetType());
+	content = file->Load();
+	if (file != 0) {
+		delete file;
 	}
-	else
-	{
-		// Close handles to the child process and its primary thread.
-		// Some applications might keep these handles to monitor the status
-		// of the child process, for example.
-		CloseHandle(piProcInfo.hProcess);
-		CloseHandle(piProcInfo.hThread);
+	index = content.find("error");
 
-		// Close handles to the stdin and stdout pipes no longer needed by the child process.
-		// If they are not explicitly closed, there is no way to recognize that the child process has ended.
+	if (index == -1) {
+		//2.4. 수정한 exe를 실행한다.
+		TCHAR szCmdline[] = TEXT("ChildProcess");
+		PROCESS_INFORMATION piProcInfo;
+		STARTUPINFO siStartInfo;
+		BOOL bSuccess = FALSE;
+
+		// Set up members of the PROCESS_INFORMATION structure. 
+
+		ZeroMemory(&piProcInfo, sizeof(PROCESS_INFORMATION));
+
+		// Set up members of the STARTUPINFO structure. 
+		// This structure specifies the STDIN and STDOUT handles for redirection.
+
+		ZeroMemory(&siStartInfo, sizeof(STARTUPINFO));
+		siStartInfo.cb = sizeof(STARTUPINFO);
+		siStartInfo.hStdError = NULL;
+		siStartInfo.hStdOutput = NULL;
+		siStartInfo.hStdInput = NULL;
+		siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
+		siStartInfo.lpTitle = (LPSTR)"디버그 콘솔";
+
+		bSuccess = CreateProcess(tempExe.c_str(),
+			szCmdline,      // command line 
+			NULL,          // process security attributes 
+			NULL,          // primary thread security attributes 
+			TRUE,          // handles are inherited 
+			CREATE_NEW_CONSOLE,             // creation flags 
+			NULL,          // use parent's environment 
+			NULL,          // use parent's current directory 
+			&siStartInfo,  // STARTUPINFO pointer 
+			&piProcInfo);  // receives PROCESS_INFORMATION 
+
+		 // If an error occurs, exit the application. 
+		if (!bSuccess) {
+		}
+		else
+		{
+			// Close handles to the child process and its primary thread.
+			// Some applications might keep these handles to monitor the status
+			// of the child process, for example.
+			CloseHandle(piProcInfo.hProcess);
+			CloseHandle(piProcInfo.hThread);
+
+			// Close handles to the stdin and stdout pipes no longer needed by the child process.
+			// If they are not explicitly closed, there is no way to recognize that the child process has ended.
+		}
 	}
 	//2.5. 프로세스가 종료되면 수정한 c와 exe를 삭제한다.
 	cmd = "del " + tempSource;
 	system(cmd.c_str());
-	cmd = "del " + tempExe;
+	cmd = "del " + tempResult;
 	system(cmd.c_str());
-	cmd = "del " + exeName;
-	system(cmd.c_str());
+
+	this->codeEditingForm->SetIsCompiled(FALSE);
+	this->codeEditingForm->SetIsLinked(FALSE);
 }
 
 string CLoadCommand::GetType() {

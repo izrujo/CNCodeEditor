@@ -175,7 +175,16 @@
     <ClInclude Include="CodeEditor\CodeEditorApp.h">
       <Filter>CodeEditor</Filter>
     </ClInclude>
-    <ClInclude Include="CodeEditor\ConsoleForm.h">
+    <ClInclude Include="CodeEditor\OutputForm.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\GraphVisitors.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\UIGraphFactory.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\UIGraphs.h">
       <Filter>CodeEditor</Filter>
     </ClInclude>
   </ItemGroup>
@@ -330,7 +339,16 @@
     <ClCompile Include="CodeEditor\CodeEditorApp.cpp">
       <Filter>CodeEditor</Filter>
     </ClCompile>
-    <ClCompile Include="CodeEditor\ConsoleForm.cpp">
+    <ClCompile Include="CodeEditor\OutputForm.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\GraphVisitors.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\UIGraphFactory.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\UIGraphs.cpp">
       <Filter>CodeEditor</Filter>
     </ClCompile>
   </ItemGroup>

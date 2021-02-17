@@ -404,4 +404,14 @@ public:
 	CNTCtrlF5KeyAction& operator =(const CNTCtrlF5KeyAction& source);
 };
 
+//CNTCtrlF7KeyAction
+class CNTCtrlF7KeyAction : public CNTKeyAction {
+public:
+	CNTCtrlF7KeyAction(TextEditingForm* textEditingForm = 0);
+	CNTCtrlF7KeyAction(const CNTCtrlF7KeyAction& source);
+	virtual ~CNTCtrlF7KeyAction();
+	virtual void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+	CNTCtrlF7KeyAction& operator =(const CNTCtrlF7KeyAction& source);
+};
+
 #endif //_CNTKEYACTIONS_H
