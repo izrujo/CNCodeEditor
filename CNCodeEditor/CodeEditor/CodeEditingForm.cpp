@@ -12,8 +12,12 @@
 BEGIN_MESSAGE_MAP(CodeEditingForm, TextEditingForm)
 	ON_WM_CREATE()
 	ON_WM_CLOSE()
-	ON_COMMAND_RANGE(IDCNT_EDIT_WRITE, IDCNT_EDIT_REDO, OnCommandRange)
+	ON_COMMAND_RANGE(IDCNT_EDIT_WRITE, IDCNT_EDIT_REDO, OnEditCommandRange)
+	ON_COMMAND_RANGE(IDCNT_MOVE_LEFT, IDCNT_SELECTMOVE_CTRLEND, OnMoveCommandRange)
 	ON_WM_KEYDOWN()
+	ON_WM_HSCROLL()
+	ON_WM_VSCROLL()
+	ON_WM_MOUSEWHEEL()
 END_MESSAGE_MAP()
 
 CodeEditingForm::CodeEditingForm()
@@ -31,7 +35,7 @@ void CodeEditingForm::OnClose() {
 	TextEditingForm::OnClose();
 }
 
-void CodeEditingForm::OnCommandRange(UINT uID) {
+void CodeEditingForm::OnEditCommandRange(UINT uID) {
 	Long previousLength = this->note->GetLength();
 
 	TextEditingForm::OnEditCommandRange(uID);
@@ -70,6 +74,12 @@ void CodeEditingForm::OnCommandRange(UINT uID) {
 	}
 }
 
+void CodeEditingForm::OnMoveCommandRange(UINT uID) {
+	TextEditingForm::OnMoveCommandRange(uID);
+
+	static_cast<CodeEditor*>(this->GetParent())->codeNumberingForm->Invalidate();
+}
+
 void CodeEditingForm::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) {
 	KeyActionFactory keyActionFactory(this);
 	KeyAction* keyAction = keyActionFactory.Make(nChar);
@@ -80,4 +90,24 @@ void CodeEditingForm::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) {
 	}
 
 	TextEditingForm::OnKeyDown(nChar, nRepCnt, nFlags);
+}
+
+void CodeEditingForm::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar) {
+	TextEditingForm::OnHScroll(nSBCode, nPos, pScrollBar);
+
+	static_cast<CodeEditor*>(this->GetParent())->codeNumberingForm->Invalidate();
+}
+
+void CodeEditingForm::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar) {
+	TextEditingForm::OnVScroll(nSBCode, nPos, pScrollBar);
+
+	static_cast<CodeEditor*>(this->GetParent())->codeNumberingForm->Invalidate();
+}
+
+BOOL CodeEditingForm::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) {
+	TextEditingForm::OnMouseWheel(nFlags, zDelta, pt);
+
+	static_cast<CodeEditor*>(this->GetParent())->codeNumberingForm->Invalidate();
+
+	return TRUE;
 }

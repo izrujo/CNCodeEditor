@@ -30,7 +30,7 @@ int CodeNumberingForm::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 	this->GetClientRect(rect);
 
 	this->numberStick = new NumberStick;
-	
+
 	UIGraphFactory graphFactory;
 
 	CodeEditor* codeEditor = static_cast<CodeEditor*>(this->parent);
@@ -66,21 +66,13 @@ void CodeNumberingForm::OnPaint() {
 
 	dc.FillSolidRect(&rect, RGB(255, 255, 255));
 
-	CPen pen(PS_SOLID, 1, RGB(0, 0, 0));
-	CPen* oldPen = dc.SelectObject(&pen);
-
-	dc.MoveTo(rect.right-5, rect.top);
-	dc.LineTo(rect.right-5, rect.bottom);
-
-	dc.SelectObject(oldPen);
-
 	CodeEditingForm* codeEditingForm = static_cast<CodeEditor*>(this->parent)->codeEditingForm;
 	CFont* oldFont;
 	CFont font;
 	codeEditingForm->font->Create(font);
 	oldFont = dc.SelectObject(&font);
 
-	GraphVisitor* visitor = new GraphDrawingVisitor(&dc);
+	GraphVisitor* visitor = new GraphDrawingVisitor(&dc, codeEditingForm->scrollController);
 	this->numberStick->Accept(visitor);
 
 	dc.SelectObject(oldFont);
@@ -132,12 +124,12 @@ Long CodeNumberingForm::AddNumber(Long number) {
 	CodeEditor* codeEditor = static_cast<CodeEditor*>(this->parent);
 	UIGraphFactory graphFactory;
 	UIGraph* last = this->numberStick->GetAt(this->numberStick->GetLength() - 1);
-	
+
 	Long y = last->GetY() + last->GetHeight();
 	string num = to_string(number);
 	UIGraph* addingNumber = graphFactory.Make(LINENUMBER, last->GetX(), y, last->GetWidth(), last->GetHeight(), num);
 	Long index = this->numberStick->Add(addingNumber);
-	
+
 	this->Invalidate();
 
 	return index;

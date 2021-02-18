@@ -30,6 +30,7 @@ public:
 
 protected:
 	afx_msg void OnClose();
+	afx_msg void OnPaint();
 	afx_msg void OnSize(UINT nType, int cs, int cy);
 	afx_msg void OnSetFocus(CWnd* pOldWnd);
 	afx_msg void OnKillFocus(CWnd* pNewWnd);

@@ -3,6 +3,8 @@
 
 #include <afxwin.h>
 
+class ScrollController;
+
 class WindowCaption;
 class WindowCloseButton;
 class NumberStick;
@@ -22,7 +24,7 @@ public:
 //GraphDrawingVisitor
 class GraphDrawingVisitor : public GraphVisitor {
 public:
-	GraphDrawingVisitor(CDC* dc = 0);
+	GraphDrawingVisitor(CDC* dc = 0, ScrollController* scrollController = 0);
 	virtual ~GraphDrawingVisitor();
 
 	virtual void Visit(WindowCaption* element);
@@ -32,6 +34,7 @@ public:
 
 private:
 	CDC* dc;
+	ScrollController* scrollController;
 };
 
 

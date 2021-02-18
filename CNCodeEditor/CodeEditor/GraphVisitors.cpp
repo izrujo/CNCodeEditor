@@ -1,5 +1,7 @@
 #include "GraphVisitors.h"
 #include "UIGraphs.h"
+#include "../TextEditor/ScrollController.h"
+#include "../TextEditor/Scroll.h"
 
 GraphVisitor::GraphVisitor() {
 
@@ -10,8 +12,9 @@ GraphVisitor::~GraphVisitor() {
 }
 
 //GraphDrawingVisitor
-GraphDrawingVisitor::GraphDrawingVisitor(CDC* dc) {
+GraphDrawingVisitor::GraphDrawingVisitor(CDC* dc, ScrollController* scrollController) {
 	this->dc = dc;
+	this->scrollController = scrollController;
 }
 
 GraphDrawingVisitor::~GraphDrawingVisitor() {
@@ -25,7 +28,7 @@ void GraphDrawingVisitor::Visit(WindowCaption* element) {
 	Long height = element->GetHeight();
 
 	CPen pen(PS_SOLID, 2, RGB(0, 0, 0));
-	CPen *oldPen = this->dc->SelectObject(&pen);
+	CPen* oldPen = this->dc->SelectObject(&pen);
 
 	this->dc->MoveTo(x, y);
 	this->dc->LineTo(x + width, y);
@@ -34,11 +37,11 @@ void GraphDrawingVisitor::Visit(WindowCaption* element) {
 
 	this->dc->SelectObject(oldPen);
 
-	CFont *font = this->dc->GetCurrentFont();
+	CFont* font = this->dc->GetCurrentFont();
 	LOGFONT logFont;
 	font->GetLogFont(&logFont);
 	Long contentHeight = logFont.lfHeight;
-	CRect rect(x+10, y + (height - contentHeight) / 2, x + width, y + height);
+	CRect rect(x + 10, y + (height - contentHeight) / 2, x + width, y + height);
 	this->dc->DrawText(element->GetContent().c_str(), rect, DT_LEFT | DT_VCENTER);
 }
 
@@ -55,8 +58,8 @@ void GraphDrawingVisitor::Visit(WindowCloseButton* element) {
 
 	this->dc->MoveTo(x, y);
 	this->dc->LineTo(x + width, y);
-	this->dc->MoveTo(x, y+height);
-	this->dc->LineTo(x + width, y+height);
+	this->dc->MoveTo(x, y + height);
+	this->dc->LineTo(x + width, y + height);
 
 	this->dc->MoveTo(x + hhhWidth * 2, y + hhhHeight * 2);
 	this->dc->LineTo(x + hhhWidth * 6, y + hhhHeight * 6);
@@ -80,6 +83,12 @@ void GraphDrawingVisitor::Visit(LineNumber* element) {
 	Long y = element->GetY();
 	Long width = element->GetWidth();
 	Long height = element->GetHeight();
+
+	Long yScrollPosition = 0;
+	if (this->scrollController != NULL) {
+		yScrollPosition = this->scrollController->GetVerticalScroll()->GetPosition();
+	}
+	y -= yScrollPosition;
 
 	CFont* font = this->dc->GetCurrentFont();
 	LOGFONT logFont;
