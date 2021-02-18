@@ -1,5 +1,5 @@
 #include "Commands.h"
-#include "CodeEditingForm.h"
+#include "CodeEditor.h"
 #include "FileManager.h"
 #include "Document.h"
 #include "FileDialog.h"
@@ -13,7 +13,8 @@
 #include "Files.h"
 #include "FileFactory.h"
 #include "OutputForm.h"
-#include "../TextEditor/TextEditingForm.h"
+#include "CodeNumberingForm.h"
+#include "CodeEditingForm.h"
 #include "../TextEditor/Font.h"
 #include "../TextEditor/CharacterMetrics.h"
 #include "../TextEditor/GlyphFactory.h"
@@ -42,12 +43,12 @@
 #pragma warning(disable:4996)
 
 //Command
-Command::Command(CodeEditingForm* codeEditingForm) {
-	this->codeEditingForm = codeEditingForm;
+Command::Command(CodeEditor* codeEditor) {
+	this->codeEditor = codeEditor;
 }
 
 Command::Command(const Command& source) {
-	this->codeEditingForm = source.codeEditingForm;
+	this->codeEditor = source.codeEditor;
 }
 
 Command::~Command() {
@@ -55,14 +56,14 @@ Command::~Command() {
 }
 
 Command& Command::operator=(const Command& source) {
-	this->codeEditingForm = source.codeEditingForm;
+	this->codeEditor = source.codeEditor;
 
 	return *this;
 }
 
 //FontCommand
-FontCommand::FontCommand(CodeEditingForm* codeEditingForm)
-	: Command(codeEditingForm) {
+FontCommand::FontCommand(CodeEditor* codeEditor)
+	: Command(codeEditor) {
 }
 
 FontCommand::FontCommand(const FontCommand& source)
@@ -81,7 +82,7 @@ FontCommand& FontCommand::operator=(const FontCommand& source) {
 }
 
 void FontCommand::Execute() {
-	LOGFONT logFont = this->codeEditingForm->textEditingForm->font->GetFont();
+	LOGFONT logFont = this->codeEditor->codeEditingForm->font->GetFont();
 	COLORREF color;
 	CFontDialog fontDialog(&logFont);
 	int ret = fontDialog.DoModal();
@@ -89,40 +90,42 @@ void FontCommand::Execute() {
 		//폰트 대화 상자에서 폰트 정보를 가져온다.
 		fontDialog.GetCurrentFont(&logFont);
 		color = fontDialog.GetColor();
-		if (this->codeEditingForm->textEditingForm->font != NULL) {
-			delete this->codeEditingForm->textEditingForm->font;
+		if (this->codeEditor->codeEditingForm->font != NULL) {
+			delete this->codeEditor->codeEditingForm->font;
 		}
-		this->codeEditingForm->textEditingForm->font = new Font(logFont, color, this->codeEditingForm);
-		if (this->codeEditingForm->textEditingForm->characterMetrics != NULL) {
-			delete this->codeEditingForm->textEditingForm->characterMetrics;
+		this->codeEditor->codeEditingForm->font = new Font(logFont, color, this->codeEditor);
+		if (this->codeEditor->codeEditingForm->characterMetrics != NULL) {
+			delete this->codeEditor->codeEditingForm->characterMetrics;
 		}
-		this->codeEditingForm->textEditingForm->characterMetrics = new CharacterMetrics(this->codeEditingForm, this->codeEditingForm->textEditingForm->font);
+		this->codeEditor->codeEditingForm->characterMetrics = new CharacterMetrics(this->codeEditor, this->codeEditor->codeEditingForm->font);
 
 		//=====자동 개행 처리=====
-		if (this->codeEditingForm->textEditingForm->GetIsLockedHScroll() == TRUE) {
+		if (this->codeEditor->codeEditingForm->GetIsLockedHScroll() == TRUE) {
 			CRect rect;
-			this->codeEditingForm->textEditingForm->GetClientRect(rect);
-			DummyManager dummyManager(this->codeEditingForm->textEditingForm->note, this->codeEditingForm->textEditingForm->characterMetrics, rect.Width());
+			this->codeEditor->codeEditingForm->GetClientRect(rect);
+			DummyManager dummyManager(this->codeEditor->codeEditingForm->note, this->codeEditor->codeEditingForm->characterMetrics, rect.Width());
 
-			Long row = this->codeEditingForm->textEditingForm->note->GetCurrent();
-			Long column = this->codeEditingForm->textEditingForm->current->GetCurrent();
+			Long row = this->codeEditor->codeEditingForm->note->GetCurrent();
+			Long column = this->codeEditor->codeEditingForm->current->GetCurrent();
 			Long distance = dummyManager.CountDistance(row, column);
 			Long i = 0;
-			while (i < this->codeEditingForm->textEditingForm->note->GetLength()) {
+			while (i < this->codeEditor->codeEditingForm->note->GetLength()) {
 				dummyManager.Unfold(i);
 				i++;
 			}
 			i = 0;
-			while (i < this->codeEditingForm->textEditingForm->note->GetLength()) {
+			while (i < this->codeEditor->codeEditingForm->note->GetLength()) {
 				i = dummyManager.Fold(i);
 				i++;
 			}
 			dummyManager.CountIndex(distance, &row, &column);
-			this->codeEditingForm->textEditingForm->note->Move(row);
-			this->codeEditingForm->textEditingForm->current = this->codeEditingForm->textEditingForm->note->GetAt(row);
-			this->codeEditingForm->textEditingForm->current->Move(column);
+			this->codeEditor->codeEditingForm->note->Move(row);
+			this->codeEditor->codeEditingForm->current = this->codeEditor->codeEditingForm->note->GetAt(row);
+			this->codeEditor->codeEditingForm->current->Move(column);
 		}
 		//=====자동 개행 처리=====
+
+		this->codeEditor->codeNumberingForm->UpdateNumber();
 	}
 }
 
@@ -135,8 +138,8 @@ Command* FontCommand::Clone() {
 }
 
 //NewCommand
-NewCommand::NewCommand(CodeEditingForm* codeEditingForm)
-	: Command(codeEditingForm) {
+NewCommand::NewCommand(CodeEditor* codeEditor)
+	: Command(codeEditor) {
 }
 
 NewCommand::NewCommand(const NewCommand& source)
@@ -154,10 +157,10 @@ NewCommand& NewCommand::operator=(const NewCommand& source) {
 }
 
 void NewCommand::Execute() {
-	FileManager fileManager(this->codeEditingForm);
+	FileManager fileManager(this->codeEditor);
 	int message;
-	bool isDirty = this->codeEditingForm->document->GetIsDirty();
-	string fileName = this->codeEditingForm->document->GetPathName();
+	bool isDirty = this->codeEditor->document->GetIsDirty();
+	string fileName = this->codeEditor->document->GetPathName();
 
 	string format = "c";
 	string formatlist = "C Source(*.c) | *.c ||";
@@ -173,21 +176,21 @@ void NewCommand::Execute() {
 				int ret = fileDialog.DoModal();
 				if (ret == IDOK) {
 					string encodingType = fileDialog.GetEncodingType();
-					this->codeEditingForm->document->SetEncodingType(encodingType);
+					this->codeEditor->document->SetEncodingType(encodingType);
 					CString pathName = fileDialog.GetPathName();
-					this->codeEditingForm->document->SetPathName((LPCTSTR)pathName);
+					this->codeEditor->document->SetPathName((LPCTSTR)pathName);
 
 					fileManager.Save();
 
 					CString title = fileDialog.GetFileTitle();
 					title.AppendFormat(tailOfTitle.c_str());
-					this->codeEditingForm->SetWindowTextA((LPCTSTR)title);
+					this->codeEditor->SetWindowTextA((LPCTSTR)title);
 				}
 			}
 			else {
 				//===== See annotation of Save() in Files.h =====
 				string encodingType = "ANSI";
-				this->codeEditingForm->document->SetEncodingType(encodingType);
+				this->codeEditor->document->SetEncodingType(encodingType);
 				//===============================================
 
 				fileManager.Save();
@@ -200,12 +203,14 @@ void NewCommand::Execute() {
 		fileManager.New();
 		string pathName = "제목 없음";
 		string title = pathName + tailOfTitle;
-		this->codeEditingForm->SetWindowTextA(title.c_str());
+		this->codeEditor->SetWindowTextA(title.c_str());
 
-		this->codeEditingForm->document->SetPathName(pathName);
+		this->codeEditor->document->SetPathName(pathName);
 
-		this->codeEditingForm->document->SetIsDirty(false);
+		this->codeEditor->document->SetIsDirty(false);
 	}
+
+	this->codeEditor->codeNumberingForm->UpdateNumber();
 }
 
 string NewCommand::GetType() {
@@ -217,8 +222,8 @@ Command* NewCommand::Clone() {
 }
 
 //OpenCommand
-OpenCommand::OpenCommand(CodeEditingForm* codeEditingForm)
-	: Command(codeEditingForm) {
+OpenCommand::OpenCommand(CodeEditor* codeEditor)
+	: Command(codeEditor) {
 }
 
 OpenCommand::OpenCommand(const OpenCommand& source)
@@ -236,10 +241,10 @@ OpenCommand& OpenCommand::operator=(const OpenCommand& source) {
 }
 
 void OpenCommand::Execute() {
-	FileManager fileManager(this->codeEditingForm);
+	FileManager fileManager(this->codeEditor);
 	int message;
-	bool isDirty = this->codeEditingForm->document->GetIsDirty();
-	string fileName = this->codeEditingForm->document->GetPathName();
+	bool isDirty = this->codeEditor->document->GetIsDirty();
+	string fileName = this->codeEditor->document->GetPathName();
 
 	string format = "c";
 	string formatlist = "C Source(*.c) | *.c ||";
@@ -255,21 +260,21 @@ void OpenCommand::Execute() {
 				int ret = fileDialog.DoModal();
 				if (ret == IDOK) {
 					string encodingType = fileDialog.GetEncodingType();
-					this->codeEditingForm->document->SetEncodingType(encodingType);
+					this->codeEditor->document->SetEncodingType(encodingType);
 					CString pathName = fileDialog.GetPathName();
-					this->codeEditingForm->document->SetPathName((LPCTSTR)pathName);
+					this->codeEditor->document->SetPathName((LPCTSTR)pathName);
 
 					fileManager.Save();
 
 					CString title = fileDialog.GetFileTitle();
 					title.AppendFormat(tailOfTitle.c_str());
-					this->codeEditingForm->SetWindowTextA((LPCTSTR)title);
+					this->codeEditor->SetWindowTextA((LPCTSTR)title);
 				}
 			}
 			else {
 				//===== See annotation of Save() in Files.h =====
 				string encodingType = "ANSI";
-				this->codeEditingForm->document->SetEncodingType(encodingType);
+				this->codeEditor->document->SetEncodingType(encodingType);
 				//===============================================
 
 				fileManager.Save();
@@ -282,15 +287,17 @@ void OpenCommand::Execute() {
 		int ret = fileDialog.DoModal();
 		if (ret == IDOK) {
 			CString pathName = fileDialog.GetPathName();
-			this->codeEditingForm->document->SetPathName((LPCTSTR)pathName);
+			this->codeEditor->document->SetPathName((LPCTSTR)pathName);
 
 			fileManager.Load();
 
 			CString title = fileDialog.GetFileTitle();
 			title.AppendFormat(tailOfTitle.c_str());
-			this->codeEditingForm->SetWindowTextA((LPCTSTR)title);
+			this->codeEditor->SetWindowTextA((LPCTSTR)title);
 
-			this->codeEditingForm->document->SetIsDirty(false);
+			this->codeEditor->document->SetIsDirty(false);
+
+			this->codeEditor->codeNumberingForm->UpdateNumber();
 		}
 	}
 }
@@ -304,8 +311,8 @@ Command* OpenCommand::Clone() {
 }
 
 //SaveCommand
-SaveCommand::SaveCommand(CodeEditingForm* codeEditingForm)
-	: Command(codeEditingForm) {
+SaveCommand::SaveCommand(CodeEditor* codeEditor)
+	: Command(codeEditor) {
 }
 
 SaveCommand::SaveCommand(const SaveCommand& source)
@@ -323,8 +330,8 @@ SaveCommand& SaveCommand::operator=(const SaveCommand& source) {
 }
 
 void SaveCommand::Execute() {
-	FileManager fileManager(this->codeEditingForm);
-	string fileName = this->codeEditingForm->document->GetPathName();
+	FileManager fileManager(this->codeEditor);
+	string fileName = this->codeEditor->document->GetPathName();
 
 	string format = "c";
 	string formatlist = "C Source(*.c) | *.c ||";
@@ -336,32 +343,32 @@ void SaveCommand::Execute() {
 		ret = fileDialog.DoModal();
 		if (ret == IDOK) {
 			string encodingType = fileDialog.GetEncodingType();
-			this->codeEditingForm->document->SetEncodingType(encodingType);
+			this->codeEditor->document->SetEncodingType(encodingType);
 			CString pathName = fileDialog.GetPathName();
-			this->codeEditingForm->document->SetPathName((LPCTSTR)pathName);
+			this->codeEditor->document->SetPathName((LPCTSTR)pathName);
 
 			fileManager.Save();
 
 			CString title = fileDialog.GetFileTitle();
 			title.AppendFormat(tailOfTitle.c_str());
-			this->codeEditingForm->SetWindowTextA((LPCTSTR)title);
+			this->codeEditor->SetWindowTextA((LPCTSTR)title);
 		}
 	}
 	else {
 		//===== See annotation of Save() in Files.h =====
 		string encodingType = "ANSI";
-		this->codeEditingForm->document->SetEncodingType(encodingType);
+		this->codeEditor->document->SetEncodingType(encodingType);
 		//===============================================
 
 		fileManager.Save();
 	}
 
-	if (this->codeEditingForm->document->GetIsDirty() == true && ret == IDOK) {
+	if (this->codeEditor->document->GetIsDirty() == true && ret == IDOK) {
 		CString title;
-		this->codeEditingForm->GetWindowText(title);
+		this->codeEditor->GetWindowText(title);
 		title.Delete(0);
-		this->codeEditingForm->SetWindowTextA(title);
-		this->codeEditingForm->document->SetIsDirty(false);
+		this->codeEditor->SetWindowTextA(title);
+		this->codeEditor->document->SetIsDirty(false);
 	}
 }
 
@@ -374,8 +381,8 @@ Command* SaveCommand::Clone() {
 }
 
 //SaveAsCommand
-SaveAsCommand::SaveAsCommand(CodeEditingForm* codeEditingForm)
-	: Command(codeEditingForm) {
+SaveAsCommand::SaveAsCommand(CodeEditor* codeEditor)
+	: Command(codeEditor) {
 }
 
 SaveAsCommand::SaveAsCommand(const SaveAsCommand& source)
@@ -393,7 +400,7 @@ SaveAsCommand& SaveAsCommand::operator=(const SaveAsCommand& source) {
 }
 
 void SaveAsCommand::Execute() {
-	FileManager fileManager(this->codeEditingForm);
+	FileManager fileManager(this->codeEditor);
 
 	string format = "c";
 	string formatlist = "C Source(*.c) | *.c ||";
@@ -403,23 +410,23 @@ void SaveAsCommand::Execute() {
 	int ret = fileDialog.DoModal();
 	if (ret == IDOK) {
 		string encodingType = fileDialog.GetEncodingType();
-		this->codeEditingForm->document->SetEncodingType(encodingType);
+		this->codeEditor->document->SetEncodingType(encodingType);
 		CString pathName = fileDialog.GetPathName();
-		this->codeEditingForm->document->SetPathName((LPCTSTR)pathName);
+		this->codeEditor->document->SetPathName((LPCTSTR)pathName);
 
 		fileManager.Save();
 
 		CString title = fileDialog.GetFileTitle();
 		title.AppendFormat(tailOfTitle.c_str());
-		this->codeEditingForm->SetWindowTextA((LPCTSTR)title);
+		this->codeEditor->SetWindowTextA((LPCTSTR)title);
 	}
 
-	if (this->codeEditingForm->document->GetIsDirty() == true && ret == IDOK) {
+	if (this->codeEditor->document->GetIsDirty() == true && ret == IDOK) {
 		CString title;
-		this->codeEditingForm->GetWindowText(title);
+		this->codeEditor->GetWindowText(title);
 		title.Delete(0);
-		this->codeEditingForm->SetWindowTextA(title);
-		this->codeEditingForm->document->SetIsDirty(false);
+		this->codeEditor->SetWindowTextA(title);
+		this->codeEditor->document->SetIsDirty(false);
 	}
 }
 
@@ -432,8 +439,8 @@ Command* SaveAsCommand::Clone() {
 }
 
 //CloseCommand
-CloseCommand::CloseCommand(CodeEditingForm* codeEditingForm)
-	: Command(codeEditingForm) {
+CloseCommand::CloseCommand(CodeEditor* codeEditor)
+	: Command(codeEditor) {
 }
 
 CloseCommand::CloseCommand(const CloseCommand& source)
@@ -451,7 +458,7 @@ CloseCommand& CloseCommand::operator=(const CloseCommand& source) {
 }
 
 void CloseCommand::Execute() {
-	this->codeEditingForm->SendMessage(WM_CLOSE, 0);
+	this->codeEditor->SendMessage(WM_CLOSE, 0);
 }
 
 string CloseCommand::GetType() {
@@ -463,8 +470,8 @@ Command* CloseCommand::Clone() {
 }
 
 //PageSetupCommand
-PageSetupCommand::PageSetupCommand(CodeEditingForm* codeEditingForm)
-	: Command(codeEditingForm) {
+PageSetupCommand::PageSetupCommand(CodeEditor* codeEditor)
+	: Command(codeEditor) {
 }
 
 PageSetupCommand::PageSetupCommand(const PageSetupCommand& source)
@@ -482,9 +489,9 @@ PageSetupCommand& PageSetupCommand::operator=(const PageSetupCommand& source) {
 }
 
 void PageSetupCommand::Execute() {
-	PageSetupDialog pageSetupDialog(this->codeEditingForm);
+	PageSetupDialog pageSetupDialog(this->codeEditor);
 	pageSetupDialog.DoModal();
-	this->codeEditingForm->document->deviceMode = (DEVMODE*)GlobalLock(pageSetupDialog.psd.hDevMode);
+	this->codeEditor->document->deviceMode = (DEVMODE*)GlobalLock(pageSetupDialog.psd.hDevMode);
 	GlobalUnlock(pageSetupDialog.psd.hDevMode);
 }
 
@@ -497,8 +504,8 @@ Command* PageSetupCommand::Clone() {
 }
 
 //PrintCommand
-PrintCommand::PrintCommand(CodeEditingForm* codeEditingForm)
-	: Command(codeEditingForm) {
+PrintCommand::PrintCommand(CodeEditor* codeEditor)
+	: Command(codeEditor) {
 }
 
 PrintCommand::PrintCommand(const PrintCommand& source)
@@ -517,16 +524,16 @@ PrintCommand& PrintCommand::operator=(const PrintCommand& source) {
 
 void PrintCommand::Execute() {
 	CPrintDialog pd(FALSE, PD_ALLPAGES | PD_USEDEVMODECOPIES | PD_NOPAGENUMS | PD_NOSELECTION,
-		this->codeEditingForm);
+		this->codeEditor);
 	if (IDOK == pd.DoModal()) {
 		CString deviceName = pd.GetDeviceName();
-		memcpy(this->codeEditingForm->document->deviceMode->dmDeviceName, (VOID*)LPCTSTR(deviceName), 32);
+		memcpy(this->codeEditor->document->deviceMode->dmDeviceName, (VOID*)LPCTSTR(deviceName), 32);
 
-		Glyph* note = this->codeEditingForm->textEditingForm->note->Clone();
-		if (this->codeEditingForm->textEditingForm->GetIsLockedHScroll() == TRUE) {
+		Glyph* note = this->codeEditor->codeEditingForm->note->Clone();
+		if (this->codeEditor->codeEditingForm->GetIsLockedHScroll() == TRUE) {
 			CRect rect;
-			this->codeEditingForm->GetClientRect(rect);
-			DummyManager dummyManager(note, this->codeEditingForm->textEditingForm->characterMetrics, rect.Width());
+			this->codeEditor->GetClientRect(rect);
+			DummyManager dummyManager(note, this->codeEditor->codeEditingForm->characterMetrics, rect.Width());
 			Long i = 0;
 			while (i < note->GetLength()) {
 				dummyManager.Unfold(i);
@@ -534,20 +541,20 @@ void PrintCommand::Execute() {
 			}
 		}
 
-		PrintInformation* printInformation = new PrintInformation(this->codeEditingForm, note);
+		PrintInformation* printInformation = new PrintInformation(this->codeEditor, note);
 
-		if (printInformation->printerDC.StartDocA(this->codeEditingForm->document->GetPathName().c_str()) < 0) {
+		if (printInformation->printerDC.StartDocA(this->codeEditor->document->GetPathName().c_str()) < 0) {
 			AfxMessageBox(_T("Printer wouldn't initialize"));
 		}
 		else {
-			this->codeEditingForm->printStateDialog = new PrintStateDialog(this->codeEditingForm);
-			this->codeEditingForm->printStateDialog->SetActiveWindow();
-			this->codeEditingForm->printStateDialog->ShowWindow(TRUE);
+			this->codeEditor->printStateDialog = new PrintStateDialog(this->codeEditor);
+			this->codeEditor->printStateDialog->SetActiveWindow();
+			this->codeEditor->printStateDialog->ShowWindow(TRUE);
 
-			Printer printer(this->codeEditingForm, printInformation);
+			Printer printer(this->codeEditor, printInformation);
 			printer.Print();
 
-			this->codeEditingForm->printJobManager->Check(this->codeEditingForm->printStateDialog);
+			this->codeEditor->printJobManager->Check(this->codeEditor->printStateDialog);
 		}
 	}
 }
@@ -561,8 +568,8 @@ Command* PrintCommand::Clone() {
 }
 
 //PreviewCommand
-PreviewCommand::PreviewCommand(CodeEditingForm* codeEditingForm)
-	: Command(codeEditingForm) {
+PreviewCommand::PreviewCommand(CodeEditor* codeEditor)
+	: Command(codeEditor) {
 }
 
 PreviewCommand::PreviewCommand(const PreviewCommand& source)
@@ -580,7 +587,7 @@ PreviewCommand& PreviewCommand::operator=(const PreviewCommand& source) {
 }
 
 void PreviewCommand::Execute() {
-	PreviewForm* previewForm = new PreviewForm(this->codeEditingForm);
+	PreviewForm* previewForm = new PreviewForm(this->codeEditor);
 	previewForm->Create(NULL, "인쇄 미리 보기", 13565952UL, CRect(0, 0, 1200, 875));
 	previewForm->ShowWindow(SW_NORMAL);
 	previewForm->UpdateWindow();
@@ -595,8 +602,8 @@ Command* PreviewCommand::Clone() {
 }
 
 //CopyCommand
-CopyCommand::CopyCommand(CodeEditingForm* codeEditingForm)
-	: Command(codeEditingForm) {
+CopyCommand::CopyCommand(CodeEditor* codeEditor)
+	: Command(codeEditor) {
 }
 
 CopyCommand::CopyCommand(const CopyCommand& source)
@@ -614,7 +621,7 @@ CopyCommand& CopyCommand::operator=(const CopyCommand& source) {
 }
 
 void CopyCommand::Execute() {
-	this->codeEditingForm->textEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_EDIT_COPY, 0));
+	this->codeEditor->codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_EDIT_COPY, 0));
 }
 
 string CopyCommand::GetType() {
@@ -626,8 +633,8 @@ Command* CopyCommand::Clone() {
 }
 
 //PasteCommand
-PasteCommand::PasteCommand(CodeEditingForm* codeEditingForm)
-	: Command(codeEditingForm) {
+PasteCommand::PasteCommand(CodeEditor* codeEditor)
+	: Command(codeEditor) {
 
 }
 
@@ -647,7 +654,7 @@ PasteCommand& PasteCommand::operator=(const PasteCommand& source) {
 }
 
 void PasteCommand::Execute() {
-	this->codeEditingForm->textEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_EDIT_PASTE, 0));
+	this->codeEditor->codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_EDIT_PASTE, 0));
 }
 
 string PasteCommand::GetType() {
@@ -659,8 +666,8 @@ Command* PasteCommand::Clone() {
 }
 
 //CutCommand
-CutCommand::CutCommand(CodeEditingForm* codeEditingForm)
-	: Command(codeEditingForm) {
+CutCommand::CutCommand(CodeEditor* codeEditor)
+	: Command(codeEditor) {
 
 }
 
@@ -680,7 +687,7 @@ CutCommand& CutCommand::operator=(const CutCommand& source) {
 }
 
 void CutCommand::Execute() {
-	this->codeEditingForm->textEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_EDIT_CUT, 0));
+	this->codeEditor->codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_EDIT_CUT, 0));
 }
 
 string CutCommand::GetType() {
@@ -692,8 +699,8 @@ Command* CutCommand::Clone() {
 }
 
 //SelectAllCommand
-SelectAllCommand::SelectAllCommand(CodeEditingForm* codeEditingForm)
-	: Command(codeEditingForm) {
+SelectAllCommand::SelectAllCommand(CodeEditor* codeEditor)
+	: Command(codeEditor) {
 }
 
 SelectAllCommand::SelectAllCommand(const SelectAllCommand& source)
@@ -711,7 +718,7 @@ SelectAllCommand& SelectAllCommand::operator=(const SelectAllCommand& source) {
 }
 
 void SelectAllCommand::Execute() {
-	this->codeEditingForm->textEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_EDIT_SELECTALL, 0));
+	this->codeEditor->codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_EDIT_SELECTALL, 0));
 }
 
 string SelectAllCommand::GetType() {
@@ -723,8 +730,8 @@ Command* SelectAllCommand::Clone() {
 }
 
 //DeleteSelectionCommand
-DeleteSelectionCommand::DeleteSelectionCommand(CodeEditingForm* codeEditingForm)
-	: Command(codeEditingForm) {
+DeleteSelectionCommand::DeleteSelectionCommand(CodeEditor* codeEditor)
+	: Command(codeEditor) {
 
 }
 
@@ -743,7 +750,7 @@ DeleteSelectionCommand& DeleteSelectionCommand::operator=(const DeleteSelectionC
 }
 
 void DeleteSelectionCommand::Execute() {
-	this->codeEditingForm->textEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_EDIT_DELETESELECTION, 0));
+	this->codeEditor->codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_EDIT_DELETESELECTION, 0));
 }
 
 string DeleteSelectionCommand::GetType() {
@@ -755,8 +762,8 @@ Command* DeleteSelectionCommand::Clone() {
 }
 
 //UndoCommand
-UndoCommand::UndoCommand(CodeEditingForm* codeEditingForm)
-	: Command(codeEditingForm) {
+UndoCommand::UndoCommand(CodeEditor* codeEditor)
+	: Command(codeEditor) {
 }
 
 UndoCommand::UndoCommand(const UndoCommand& source)
@@ -774,7 +781,7 @@ UndoCommand& UndoCommand::operator=(const UndoCommand& source) {
 }
 
 void UndoCommand::Execute() {
-	this->codeEditingForm->textEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_EDIT_UNDO, 0));
+	this->codeEditor->codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_EDIT_UNDO, 0));
 }
 
 string UndoCommand::GetType() {
@@ -786,8 +793,8 @@ Command* UndoCommand::Clone() {
 }
 
 //RedoCommand
-RedoCommand::RedoCommand(CodeEditingForm* codeEditingForm)
-	: Command(codeEditingForm) {
+RedoCommand::RedoCommand(CodeEditor* codeEditor)
+	: Command(codeEditor) {
 }
 
 RedoCommand::RedoCommand(const RedoCommand& source)
@@ -805,7 +812,7 @@ RedoCommand& RedoCommand::operator=(const RedoCommand& source) {
 }
 
 void RedoCommand::Execute() {
-	this->codeEditingForm->textEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_EDIT_REDO, 0));
+	this->codeEditor->codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_EDIT_REDO, 0));
 }
 
 string RedoCommand::GetType() {
@@ -817,8 +824,8 @@ Command* RedoCommand::Clone() {
 }
 
 //FindCommand
-FindCommand::FindCommand(CodeEditingForm* codeEditingForm)
-	: Command(codeEditingForm) {
+FindCommand::FindCommand(CodeEditor* codeEditor)
+	: Command(codeEditor) {
 }
 
 FindCommand::FindCommand(const FindCommand& source)
@@ -836,7 +843,7 @@ FindCommand& FindCommand::operator=(const FindCommand& source) {
 }
 
 void FindCommand::Execute() {
-	this->codeEditingForm->textEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_EDIT_FIND, 0));
+	this->codeEditor->codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_EDIT_FIND, 0));
 }
 
 string FindCommand::GetType() {
@@ -848,8 +855,8 @@ Command* FindCommand::Clone() {
 }
 
 //ReplaceCommand
-ReplaceCommand::ReplaceCommand(CodeEditingForm* codeEditingForm)
-	: Command(codeEditingForm) {
+ReplaceCommand::ReplaceCommand(CodeEditor* codeEditor)
+	: Command(codeEditor) {
 }
 
 ReplaceCommand::ReplaceCommand(const ReplaceCommand& source)
@@ -867,7 +874,7 @@ ReplaceCommand& ReplaceCommand::operator=(const ReplaceCommand& source) {
 }
 
 void ReplaceCommand::Execute() {
-	this->codeEditingForm->textEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_EDIT_REPLACE, 0));
+	this->codeEditor->codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_EDIT_REPLACE, 0));
 }
 
 string ReplaceCommand::GetType() {
@@ -879,8 +886,8 @@ Command* ReplaceCommand::Clone() {
 }
 
 //ReportDirtyCommand
-ReportDirtyCommand::ReportDirtyCommand(CodeEditingForm* codeEditingForm)
-	: Command(codeEditingForm) {
+ReportDirtyCommand::ReportDirtyCommand(CodeEditor* codeEditor)
+	: Command(codeEditor) {
 }
 
 ReportDirtyCommand::ReportDirtyCommand(const ReportDirtyCommand& source)
@@ -898,14 +905,14 @@ ReportDirtyCommand& ReportDirtyCommand::operator=(const ReportDirtyCommand& sour
 }
 
 void ReportDirtyCommand::Execute() {
-	bool isDirty = this->codeEditingForm->document->GetIsDirty();
+	bool isDirty = this->codeEditor->document->GetIsDirty();
 	if (isDirty == false) {
 		CString title;
-		this->codeEditingForm->GetWindowText(title);
+		this->codeEditor->GetWindowText(title);
 		title.Insert(0, '*');
 		isDirty = true;
-		this->codeEditingForm->SetWindowTextA(title);
-		this->codeEditingForm->document->SetIsDirty(isDirty);
+		this->codeEditor->SetWindowTextA(title);
+		this->codeEditor->document->SetIsDirty(isDirty);
 	}
 }
 
@@ -918,8 +925,8 @@ Command* ReportDirtyCommand::Clone() {
 }
 
 //CCompileCommand
-CCompileCommand::CCompileCommand(CodeEditingForm* codeEditingForm)
-	: Command(codeEditingForm) {
+CCompileCommand::CCompileCommand(CodeEditor* codeEditor)
+	: Command(codeEditor) {
 }
 
 CCompileCommand::CCompileCommand(const CCompileCommand& source)
@@ -927,7 +934,7 @@ CCompileCommand::CCompileCommand(const CCompileCommand& source)
 }
 
 CCompileCommand::~CCompileCommand() {
-
+	
 }
 
 CCompileCommand& CCompileCommand::operator=(const CCompileCommand& source) {
@@ -938,72 +945,82 @@ CCompileCommand& CCompileCommand::operator=(const CCompileCommand& source) {
 
 void CCompileCommand::Execute() {
 	//현재 파일 자동 저장해야함. 실행 전에.
-	this->codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDM_FILE_SAVE, 0));
+	this->codeEditor->SendMessage(WM_COMMAND, MAKEWPARAM(IDM_FILE_SAVE, 0));
 
-	if (this->codeEditingForm->outputForm != NULL) {
-		this->codeEditingForm->outputForm->SendMessage(WM_CLOSE);
-		delete this->codeEditingForm->outputForm;
-		this->codeEditingForm->outputForm = NULL;
+	string pathName = this->codeEditor->document->GetPathName();
+
+	if (pathName != "제목 없음") {
+
+		if (this->codeEditor->outputForm != NULL) {
+			this->codeEditor->outputForm->SendMessage(WM_CLOSE);
+			delete this->codeEditor->outputForm;
+			this->codeEditor->outputForm = NULL;
+		}
+		CRect rect;
+		this->codeEditor->GetClientRect(rect);
+		this->codeEditor->codeEditingForm->MoveWindow(rect);
+
+		//tcc 컴파일러를 이용해 현재 파일을(C 소스 파일임을 전제) 컴파일하고 그 결과를 저장한다.
+		/*string cmd = ".\\tcc\\tcc -run ";
+		cmd += this->codeEditor->document->GetPathName();
+		cmd += " > outTemp.txt 2>&1";
+		system(cmd.c_str());*/
+
+		String fileName(pathName);
+		Long index = fileName.ReversedFind('\\');
+		fileName.Delete(0, index + 1);
+		char extension1[3] = ".c";
+		char extension2[3] = ".o";
+		fileName.Replace(extension1, extension2);
+		string objectName = fileName.GetString();
+		string cmd = "del " + objectName;
+		system(cmd.c_str());
+
+		string resultFileName = "temp\\CompileResult.txt";
+
+		cmd = "gcc -c " + pathName + " > " + resultFileName + " 2>&1"; //컴파일
+		system(cmd.c_str());
+
+		File* file = new AnsiFile(resultFileName); //FileFactory::MakeOpenFile에 오류가 있는 것 같다.ansi인데 utf16le로 읽어냄.
+		this->codeEditor->document->SetEncodingType(file->GetType());
+		string result = file->Load();
+		index = result.find("error");
+		if (index == -1) {
+			result += "\r\nCompile Succeed.\r\n";
+		}
+		else {
+			result += "\r\nCompile Failed.\r\n";
+		}
+
+		if (file != 0) {
+			delete file;
+		}
+
+		this->codeEditor->document->SetPathName(pathName);
+
+		this->codeEditor->GetClientRect(rect);
+		CRect outputRect = rect;
+		outputRect.top += (outputRect.Height() / 4) * 3;
+		rect.bottom = outputRect.top;
+
+		Long width = rect.Width() - CODENUMBERFORMWIDTH;
+		rect.left += CODENUMBERFORMWIDTH;
+		rect.right = rect.left + width;
+		this->codeEditor->codeEditingForm->MoveWindow(rect);
+
+		rect.left -= CODENUMBERFORMWIDTH;
+		rect.right = rect.left + CODENUMBERFORMWIDTH;
+		this->codeEditor->codeNumberingForm->MoveWindow(rect);
+
+		this->codeEditor->outputForm = new OutputForm(this->codeEditor, result, resultFileName);
+		this->codeEditor->outputForm->Create(NULL, "Output", WS_CHILD,
+			outputRect, this->codeEditor, NULL, NULL);
+		this->codeEditor->outputForm->ShowWindow(SW_SHOW);
+		this->codeEditor->outputForm->UpdateWindow();
+
+		this->codeEditor->SetIsCompiled(TRUE);
+		this->codeEditor->SetIsLinked(FALSE);
 	}
-	CRect rect;
-	this->codeEditingForm->GetClientRect(rect);
-	this->codeEditingForm->textEditingForm->MoveWindow(rect);
-
-	//tcc 컴파일러를 이용해 현재 파일을(C 소스 파일임을 전제) 컴파일하고 그 결과를 저장한다.
-	/*string cmd = ".\\tcc\\tcc -run ";
-	cmd += this->codeEditingForm->document->GetPathName();
-	cmd += " > outTemp.txt 2>&1";
-	system(cmd.c_str());*/
-
-	string pathName = this->codeEditingForm->document->GetPathName();
-
-	String fileName(pathName);
-	Long index = fileName.ReversedFind('\\');
-	fileName.Delete(0, index + 1);
-	char extension1[3] = ".c";
-	char extension2[3] = ".o";
-	fileName.Replace(extension1, extension2);
-	string objectName = fileName.GetString();
-	string cmd = "del " + objectName;
-	system(cmd.c_str());
-
-	string resultFileName = "temp\\CompileResult.txt";
-
-	cmd = "gcc -c " + pathName + " > " + resultFileName + " 2>&1"; //컴파일
-	system(cmd.c_str());
-
-	File* file = new AnsiFile(resultFileName); //FileFactory::MakeOpenFile에 오류가 있는 것 같다.ansi인데 utf16le로 읽어냄.
-	this->codeEditingForm->document->SetEncodingType(file->GetType());
-	string result = file->Load();
-	index = result.find("error");
-	if (index == -1) {
-		result += "\r\nCompile Succeed.\r\n";
-	}
-	else {
-		result += "\r\nCompile Failed.\r\n";
-	}
-
-	if (file != 0) {
-		delete file;
-	}
-
-	this->codeEditingForm->document->SetPathName(pathName);
-
-	this->codeEditingForm->GetClientRect(rect);
-	CRect outputRect = rect;
-	outputRect.top += (outputRect.Height() / 4) * 3;
-	rect.bottom = outputRect.top;
-
-	this->codeEditingForm->textEditingForm->MoveWindow(rect);
-
-	this->codeEditingForm->outputForm = new OutputForm(this->codeEditingForm, result, resultFileName);
-	this->codeEditingForm->outputForm->Create(NULL, "Output", WS_CHILD,
-		outputRect, this->codeEditingForm, NULL, NULL);
-	this->codeEditingForm->outputForm->ShowWindow(SW_SHOW);
-	this->codeEditingForm->outputForm->UpdateWindow();
-
-	this->codeEditingForm->SetIsCompiled(TRUE);
-	this->codeEditingForm->SetIsLinked(FALSE);
 }
 
 string CCompileCommand::GetType() {
@@ -1015,8 +1032,8 @@ Command* CCompileCommand::Clone() {
 }
 
 //CLinkCommand
-CLinkCommand::CLinkCommand(CodeEditingForm* codeEditingForm)
-	: Command(codeEditingForm) {
+CLinkCommand::CLinkCommand(CodeEditor* codeEditor)
+	: Command(codeEditor) {
 }
 
 CLinkCommand::CLinkCommand(const CLinkCommand& source)
@@ -1037,7 +1054,7 @@ void CLinkCommand::Execute() {
 	//컴파일 안했으면 컴파일도.
 	//gcc -o filename.o
 
-	string pathName = this->codeEditingForm->document->GetPathName();
+	string pathName = this->codeEditor->document->GetPathName();
 
 	String fileName(pathName);
 	Long index = fileName.ReversedFind('\\');
@@ -1058,7 +1075,7 @@ void CLinkCommand::Execute() {
 	system(cmd.c_str());
 
 	File* file = new AnsiFile(resultFileName); //FileFactory::MakeOpenFile에 오류가 있는 것 같다.ansi인데 utf16le로 읽어냄.
-	this->codeEditingForm->document->SetEncodingType(file->GetType());
+	this->codeEditor->document->SetEncodingType(file->GetType());
 	string result = file->Load();
 	if (result.length() < 1) {
 		result += "\r\nLink Succeed.\r\n";
@@ -1071,28 +1088,35 @@ void CLinkCommand::Execute() {
 		delete file;
 	}
 
-	this->codeEditingForm->document->SetPathName(pathName);
+	this->codeEditor->document->SetPathName(pathName);
 
-	if (this->codeEditingForm->outputForm == NULL) {
+	if (this->codeEditor->outputForm == NULL) {
 		CRect rect;
-		this->codeEditingForm->GetClientRect(rect);
+		this->codeEditor->GetClientRect(rect);
 		CRect outputRect = rect;
 		outputRect.top += (outputRect.Height() / 4) * 3;
 		rect.bottom = outputRect.top;
 
-		this->codeEditingForm->textEditingForm->MoveWindow(rect);
+		Long width = rect.Width() - CODENUMBERFORMWIDTH;
+		rect.left += CODENUMBERFORMWIDTH;
+		rect.right = rect.left + width;
+		this->codeEditor->codeEditingForm->MoveWindow(rect);
 
-		this->codeEditingForm->outputForm = new OutputForm(this->codeEditingForm, result, resultFileName);
-		this->codeEditingForm->outputForm->Create(NULL, "Output", WS_CHILD,
-			outputRect, this->codeEditingForm, NULL, NULL);
-		this->codeEditingForm->outputForm->ShowWindow(SW_SHOW);
-		this->codeEditingForm->outputForm->UpdateWindow();
+		rect.left -= CODENUMBERFORMWIDTH;
+		rect.right = rect.left + CODENUMBERFORMWIDTH;
+		this->codeEditor->codeNumberingForm->MoveWindow(rect);
+
+		this->codeEditor->outputForm = new OutputForm(this->codeEditor, result, resultFileName);
+		this->codeEditor->outputForm->Create(NULL, "Output", WS_CHILD,
+			outputRect, this->codeEditor, NULL, NULL);
+		this->codeEditor->outputForm->ShowWindow(SW_SHOW);
+		this->codeEditor->outputForm->UpdateWindow();
 	}
 	else {
-		this->codeEditingForm->outputForm->AppendResult(result, resultFileName);
+		this->codeEditor->outputForm->AppendResult(result, resultFileName);
 	}
 
-	this->codeEditingForm->SetIsLinked(TRUE);
+	this->codeEditor->SetIsLinked(TRUE);
 }
 
 string CLinkCommand::GetType() {
@@ -1104,8 +1128,8 @@ Command* CLinkCommand::Clone() {
 }
 
 //CLoadCommand
-CLoadCommand::CLoadCommand(CodeEditingForm* codeEditingForm)
-	: Command(codeEditingForm) {
+CLoadCommand::CLoadCommand(CodeEditor* codeEditor)
+	: Command(codeEditor) {
 }
 
 CLoadCommand::CLoadCommand(const CLoadCommand& source)
@@ -1123,127 +1147,131 @@ CLoadCommand& CLoadCommand::operator=(const CLoadCommand& source) {
 }
 
 void CLoadCommand::Execute() {
-	if (this->codeEditingForm->GetIsCompiled() == FALSE) {
-		this->codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDM_C_COMPILE, 0));
+	if (this->codeEditor->GetIsCompiled() == FALSE) {
+		this->codeEditor->SendMessage(WM_COMMAND, MAKEWPARAM(IDM_C_COMPILE, 0));
 	}
-	if (this->codeEditingForm->GetIsLinked() == FALSE) {
-		this->codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDM_C_LINK, 0));
-	}
+	string pathName = this->codeEditor->document->GetPathName();
 
-	string pathName = this->codeEditingForm->document->GetPathName();
+	if (pathName != "제목 없음") {
 
-	string tempDirectory = "temp\\";
-
-	//2.1. c 파일을 연다. full\\path\\filename.c
-	FileFactory fileFactory;
-	File* file = fileFactory.MakeOpenFile(pathName);
-	this->codeEditingForm->document->SetEncodingType(file->GetType());
-	string content = file->Load();
-	if (file != 0) {
-		delete file;
-	}
-
-	//2.2. 파일을 수정한다. temp\\CNTemp.c
-	//-main이 int로 시작하면 return 0;을 찾고 void면 가장 뒤의 }를 찾는다.
-	Long last = content.length();
-	Long index = content.find("main(");
-	Long rindex = content.rfind("int", index);
-	if (rindex != index) {
-		rindex = content.rfind("return 0;", last);
-	}
-	else {
-		rindex = content.rfind("}", last);
-	}
-	if (rindex != index) {
-		string additionalCodes = "printf(\"This process exited with code 0.\\n\");\n"
-			"printf(\"Press any key to close this window . . . \\n\");\n"
-			"getch();\n";
-		content.insert(rindex, additionalCodes);
-	}
-	//-찾은 곳 이전에 다음 문자열을 넣는다.
-	//printf("This process exited with code 0.\n");\n
-	//printf("Press any key to close this window . . . ");\n
-	//getch();\n
-	string tempSource = tempDirectory + "CNTemp.c";
-	file = fileFactory.MakeSaveFile(tempSource, this->codeEditingForm->document->GetEncodingType());
-	file->Save(content);
-	if (file != 0) {
-		delete file;
-	}
-
-	//2.3. 수정한 파일을 컴파일한다. temp\\CNTemp.exe
-	string tempExe = tempDirectory + "CNTemp.exe";
-	string tempResult = tempDirectory + "TempResult.txt";
-	string cmd = "gcc -o " + tempExe + " " + tempSource + " > " + tempResult + " 2>&1"; //컴파일, 링크
-	system(cmd.c_str());
-
-	//tempResult를 읽어서 'error'가 없으면(warning은 허용) 컴파일/링크에 성공한 것이므로 실행한다. 
-	//그렇지 않으면 오류이므로 실행하지 않는다.
-	//ChildProcess가 실행될 동안 tempExe파일을 제거할 수 없어 이런 방식을 취한다.
-	file = fileFactory.MakeOpenFile(tempResult);
-	this->codeEditingForm->document->SetEncodingType(file->GetType());
-	content = file->Load();
-	if (file != 0) {
-		delete file;
-	}
-	index = content.find("error");
-
-	if (index == -1) {
-		//2.4. 수정한 exe를 실행한다.
-		TCHAR szCmdline[] = TEXT("ChildProcess");
-		PROCESS_INFORMATION piProcInfo;
-		STARTUPINFO siStartInfo;
-		BOOL bSuccess = FALSE;
-
-		// Set up members of the PROCESS_INFORMATION structure. 
-
-		ZeroMemory(&piProcInfo, sizeof(PROCESS_INFORMATION));
-
-		// Set up members of the STARTUPINFO structure. 
-		// This structure specifies the STDIN and STDOUT handles for redirection.
-
-		ZeroMemory(&siStartInfo, sizeof(STARTUPINFO));
-		siStartInfo.cb = sizeof(STARTUPINFO);
-		siStartInfo.hStdError = NULL;
-		siStartInfo.hStdOutput = NULL;
-		siStartInfo.hStdInput = NULL;
-		siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
-		siStartInfo.lpTitle = (LPSTR)"디버그 콘솔";
-
-		bSuccess = CreateProcess(tempExe.c_str(),
-			szCmdline,      // command line 
-			NULL,          // process security attributes 
-			NULL,          // primary thread security attributes 
-			TRUE,          // handles are inherited 
-			CREATE_NEW_CONSOLE,             // creation flags 
-			NULL,          // use parent's environment 
-			NULL,          // use parent's current directory 
-			&siStartInfo,  // STARTUPINFO pointer 
-			&piProcInfo);  // receives PROCESS_INFORMATION 
-
-		 // If an error occurs, exit the application. 
-		if (!bSuccess) {
+		if (this->codeEditor->GetIsLinked() == FALSE) {
+			this->codeEditor->SendMessage(WM_COMMAND, MAKEWPARAM(IDM_C_LINK, 0));
 		}
-		else
-		{
-			// Close handles to the child process and its primary thread.
-			// Some applications might keep these handles to monitor the status
-			// of the child process, for example.
-			CloseHandle(piProcInfo.hProcess);
-			CloseHandle(piProcInfo.hThread);
 
-			// Close handles to the stdin and stdout pipes no longer needed by the child process.
-			// If they are not explicitly closed, there is no way to recognize that the child process has ended.
+
+		string tempDirectory = "temp\\";
+
+		//2.1. c 파일을 연다. full\\path\\filename.c
+		FileFactory fileFactory;
+		File* file = fileFactory.MakeOpenFile(pathName);
+		this->codeEditor->document->SetEncodingType(file->GetType());
+		string content = file->Load();
+		if (file != 0) {
+			delete file;
 		}
-	}
-	//2.5. 프로세스가 종료되면 수정한 c와 exe를 삭제한다.
-	cmd = "del " + tempSource;
-	system(cmd.c_str());
-	cmd = "del " + tempResult;
-	system(cmd.c_str());
 
-	this->codeEditingForm->SetIsCompiled(FALSE);
-	this->codeEditingForm->SetIsLinked(FALSE);
+		//2.2. 파일을 수정한다. temp\\CNTemp.c
+		//-main이 int로 시작하면 return 0;을 찾고 void면 가장 뒤의 }를 찾는다.
+		Long last = content.length();
+		Long index = content.find("main(");
+		Long rindex = content.rfind("int", index);
+		if (rindex != index) {
+			rindex = content.rfind("return 0;", last);
+		}
+		else {
+			rindex = content.rfind("}", last);
+		}
+		if (rindex != index) {
+			string additionalCodes = "printf(\"This process exited with code 0.\\n\");\n"
+				"printf(\"Press any key to close this window . . . \\n\");\n"
+				"getch();\n";
+			content.insert(rindex, additionalCodes);
+		}
+		//-찾은 곳 이전에 다음 문자열을 넣는다.
+		//printf("This process exited with code 0.\n");\n
+		//printf("Press any key to close this window . . . ");\n
+		//getch();\n
+		string tempSource = tempDirectory + "CNTemp.c";
+		file = fileFactory.MakeSaveFile(tempSource, this->codeEditor->document->GetEncodingType());
+		file->Save(content);
+		if (file != 0) {
+			delete file;
+		}
+
+		//2.3. 수정한 파일을 컴파일한다. temp\\CNTemp.exe
+		string tempExe = tempDirectory + "CNTemp.exe";
+		string tempResult = tempDirectory + "TempResult.txt";
+		string cmd = "gcc -o " + tempExe + " " + tempSource + " > " + tempResult + " 2>&1"; //컴파일, 링크
+		system(cmd.c_str());
+
+		//tempResult를 읽어서 'error'가 없으면(warning은 허용) 컴파일/링크에 성공한 것이므로 실행한다. 
+		//그렇지 않으면 오류이므로 실행하지 않는다.
+		//ChildProcess가 실행될 동안 tempExe파일을 제거할 수 없어 이런 방식을 취한다.
+		file = fileFactory.MakeOpenFile(tempResult);
+		this->codeEditor->document->SetEncodingType(file->GetType());
+		content = file->Load();
+		if (file != 0) {
+			delete file;
+		}
+		index = content.find("error");
+
+		if (index == -1) {
+			//2.4. 수정한 exe를 실행한다.
+			TCHAR szCmdline[] = TEXT("ChildProcess");
+			PROCESS_INFORMATION piProcInfo;
+			STARTUPINFO siStartInfo;
+			BOOL bSuccess = FALSE;
+
+			// Set up members of the PROCESS_INFORMATION structure. 
+
+			ZeroMemory(&piProcInfo, sizeof(PROCESS_INFORMATION));
+
+			// Set up members of the STARTUPINFO structure. 
+			// This structure specifies the STDIN and STDOUT handles for redirection.
+
+			ZeroMemory(&siStartInfo, sizeof(STARTUPINFO));
+			siStartInfo.cb = sizeof(STARTUPINFO);
+			siStartInfo.hStdError = NULL;
+			siStartInfo.hStdOutput = NULL;
+			siStartInfo.hStdInput = NULL;
+			siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
+			siStartInfo.lpTitle = (LPSTR)"디버그 콘솔";
+
+			bSuccess = CreateProcess(tempExe.c_str(),
+				szCmdline,      // command line 
+				NULL,          // process security attributes 
+				NULL,          // primary thread security attributes 
+				TRUE,          // handles are inherited 
+				CREATE_NEW_CONSOLE,             // creation flags 
+				NULL,          // use parent's environment 
+				NULL,          // use parent's current directory 
+				&siStartInfo,  // STARTUPINFO pointer 
+				&piProcInfo);  // receives PROCESS_INFORMATION 
+
+			 // If an error occurs, exit the application. 
+			if (!bSuccess) {
+			}
+			else
+			{
+				// Close handles to the child process and its primary thread.
+				// Some applications might keep these handles to monitor the status
+				// of the child process, for example.
+				CloseHandle(piProcInfo.hProcess);
+				CloseHandle(piProcInfo.hThread);
+
+				// Close handles to the stdin and stdout pipes no longer needed by the child process.
+				// If they are not explicitly closed, there is no way to recognize that the child process has ended.
+			}
+		}
+		//2.5. 프로세스가 종료되면 수정한 c와 exe를 삭제한다.
+		cmd = "del " + tempSource;
+		system(cmd.c_str());
+		cmd = "del " + tempResult;
+		system(cmd.c_str());
+
+		this->codeEditor->SetIsCompiled(FALSE);
+		this->codeEditor->SetIsLinked(FALSE);
+	}
 }
 
 string CLoadCommand::GetType() {

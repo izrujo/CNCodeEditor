@@ -3,16 +3,20 @@
 
 #define WINDOWCAPTION 901
 #define WINDOWCLOSEBUTTON 902
+#define NUMBERSTICK 903
+#define LINENUMBER 904
+
+#include "../Utilities/Array.h"
 
 #include <string>
 using namespace std;
 
-typedef signed long int Long;
 
 class GraphVisitor;
 
 class UIGraph {
 public:
+	UIGraph();
 	UIGraph(Long x, Long y, Long width, Long height, string content);
 	UIGraph(const UIGraph& source);
 	virtual ~UIGraph() = 0;
@@ -26,6 +30,14 @@ public:
 	virtual Long GetWidth() const;
 	virtual Long GetHeight() const;
 	virtual string GetContent() const;
+
+	virtual Long Add(UIGraph* uiGraph);
+	virtual Long Add(Long index, UIGraph* uiGraph);
+	virtual Long Remove(Long index);
+	virtual UIGraph* GetAt(Long index);
+
+	virtual Long GetCapacity() const;
+	virtual Long GetLength() const;
 
 protected:
 	Long x;
@@ -55,6 +67,48 @@ inline string UIGraph::GetContent() const {
 	return this->content;
 }
 
+//UIGraphComposite
+class UIGraphComposite : public UIGraph {
+public:
+	UIGraphComposite(Long capacity = 256);
+	UIGraphComposite(const UIGraphComposite& source);
+	virtual ~UIGraphComposite() = 0;
+	UIGraphComposite& operator=(const UIGraphComposite& source);
+	
+	virtual Long Add(UIGraph* uiGraph);
+	virtual Long Add(Long index, UIGraph* uiGraph);
+	virtual Long Remove(Long index);
+	virtual UIGraph* GetAt(Long index);
+
+	virtual Long GetCapacity() const;
+	virtual Long GetLength() const;
+
+protected:
+	Array<UIGraph*> uiGraphs;
+	Long capacity;
+	Long length;
+};
+
+inline Long UIGraphComposite::GetCapacity() const {
+	return this->capacity;
+}
+
+inline Long UIGraphComposite::GetLength() const {
+	return this->length;
+}
+
+//NumberStick
+class NumberStick : public UIGraphComposite {
+public:
+	NumberStick(Long capacity = 256);
+	NumberStick(const NumberStick& source);
+	virtual ~NumberStick();
+	NumberStick& operator=(const NumberStick& source);
+
+	virtual UIGraph* Clone();
+	virtual void Accept(GraphVisitor* visitor);
+};
+
 //WindowCaption
 class WindowCaption : public UIGraph {
 public:
@@ -74,6 +128,18 @@ public:
 	WindowCloseButton(const WindowCloseButton& source);
 	virtual ~WindowCloseButton();
 	WindowCloseButton& operator=(const WindowCloseButton& source);
+
+	virtual UIGraph* Clone();
+	virtual void Accept(GraphVisitor* visitor);
+};
+
+//LineNumber
+class LineNumber : public UIGraph {
+public:
+	LineNumber(Long x, Long y, Long width, Long height, string content);
+	LineNumber(const LineNumber& source);
+	virtual ~LineNumber();
+	LineNumber& operator=(const LineNumber& source);
 
 	virtual UIGraph* Clone();
 	virtual void Accept(GraphVisitor* visitor);

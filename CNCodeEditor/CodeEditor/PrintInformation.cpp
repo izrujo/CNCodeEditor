@@ -1,8 +1,8 @@
 #include "PrintInformation.h"
-#include "CodeEditingForm.h"
+#include "CodeEditor.h"
 #include "Document.h"
 #include "Book.h"
-#include "../TextEditor/TextEditingForm.h"
+#include "CodeEditingForm.h"
 #include "../TextEditor/CharacterMetrics.h"
 #include "../TextEditor/Font.h"
 #include "../TextEditor/Glyph.h"
@@ -10,22 +10,22 @@
 
 #include <afxdlgs.h>
 
-PrintInformation::PrintInformation(CodeEditingForm* codeEditingForm, Glyph* note) {
-	this->printerDC.CreateDC("WINSPOOL", (LPCTSTR)codeEditingForm->document->deviceMode->dmDeviceName,
-		NULL, codeEditingForm->document->deviceMode);
+PrintInformation::PrintInformation(CodeEditor* codeEditor, Glyph* note) {
+	this->printerDC.CreateDC("WINSPOOL", (LPCTSTR)codeEditor->document->deviceMode->dmDeviceName,
+		NULL, codeEditor->document->deviceMode);
 
 	Long dpi = this->printerDC.GetDeviceCaps(LOGPIXELSX);
 
-	LOGFONT logFont = codeEditingForm->textEditingForm->font->GetFont();
+	LOGFONT logFont = codeEditor->codeEditingForm->font->GetFont();
 	logFont.lfHeight = logFont.lfHeight * dpi / 144;
 	logFont.lfWidth = logFont.lfWidth * dpi / 144;
-	this->font = new Font(logFont, codeEditingForm->textEditingForm->font->GetColor(), codeEditingForm);
+	this->font = new Font(logFont, codeEditor->codeEditingForm->font->GetColor(), codeEditor);
 
-	this->characterMetrics = new CharacterMetrics(codeEditingForm, this->font);
+	this->characterMetrics = new CharacterMetrics(codeEditor, this->font);
 
 	Long deviceWidth = this->printerDC.GetDeviceCaps(PHYSICALWIDTH);
 	Long deviceHeight = this->printerDC.GetDeviceCaps(PHYSICALHEIGHT);
-	CRect deviceMargin = codeEditingForm->document->GetMargins();
+	CRect deviceMargin = codeEditor->document->GetMargins();
 	float milimeterPerInch = 25.4F;
 	deviceMargin.left = deviceMargin.left * (dpi / milimeterPerInch);
 	deviceMargin.top = deviceMargin.top * (dpi / milimeterPerInch);
@@ -34,11 +34,11 @@ PrintInformation::PrintInformation(CodeEditingForm* codeEditingForm, Glyph* note
 	Long top = deviceMargin.top;
 	Long bottom = deviceMargin.bottom;
 
-	string header = codeEditingForm->document->GetHeader();
+	string header = codeEditor->document->GetHeader();
 	if (header != "") {
 		top += this->characterMetrics->GetHeight();
 	}
-	string footer = codeEditingForm->document->GetFooter();
+	string footer = codeEditor->document->GetFooter();
 	if (footer != "") {
 		bottom += this->characterMetrics->GetHeight();
 	}

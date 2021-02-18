@@ -5,12 +5,12 @@
 
 typedef signed long int Long;
 
-class CodeEditingForm;
+class CodeEditor;
 class PrintInformation;
 
 class Printer {
 public:
-	Printer(CodeEditingForm* codeEditingForm = 0, PrintInformation *printInformation = 0);
+	Printer(CodeEditor* codeEditor = 0, PrintInformation *printInformation = 0);
 	Printer(const Printer& source);
 	~Printer();
 	Printer& operator=(const Printer& source);
@@ -18,7 +18,7 @@ public:
 	void Print();
 
 private:
-	CodeEditingForm* codeEditingForm;
+	CodeEditor* codeEditor;
 	PrintInformation* printInformation;
 };
 

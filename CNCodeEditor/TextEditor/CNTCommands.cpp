@@ -14,9 +14,6 @@
 #include "DummyManager.h"
 #include "DummyLine.h"
 
-#include "../CodeEditor/CodeEditingForm.h"
-#include "../CodeEditor/resource.h"
-
 #include <afxwin.h>
 
 #pragma warning(disable:4996)
@@ -877,12 +874,6 @@ void CNTWriteCommand::Execute() {
 		this->textEditingForm->current->Move(columnIndex);
 	}
 	//========== 磊悼 俺青 贸府 2 ==========
-
-	//Document 贸府
-	if (this->nChar >= 32 || this->nChar == VK_TAB || this->nChar == VK_RETURN) {
-		CodeEditingForm* codeEditingForm = (CodeEditingForm*)this->textEditingForm->GetParent();
-		codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDC_REPORT_DIRTY, 0));
-	}
 }
 
 void CNTWriteCommand::Unexecute() {
@@ -935,10 +926,6 @@ void CNTWriteCommand::Unexecute() {
 		this->textEditingForm->current->Move(columnIndex);
 	}
 	//========== 磊悼 俺青 贸府 2 ==========
-
-	//Document 贸府
-	CodeEditingForm* codeEditingForm = (CodeEditingForm*)this->textEditingForm->GetParent();
-	codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDC_REPORT_DIRTY, 0));
 }
 
 string CNTWriteCommand::GetType() {
@@ -1014,10 +1001,6 @@ void CNTImeCompositionCommand::Execute() {
 		this->textEditingForm->current->Move(columnIndex);
 	}
 	//========== 磊悼 俺青 贸府 2 ==========
-
-	//Document 贸府
-	CodeEditingForm* codeEditingForm = (CodeEditingForm*)this->textEditingForm->GetParent();
-	codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDC_REPORT_DIRTY, 0));
 }
 
 string CNTImeCompositionCommand::GetType() {
@@ -1122,10 +1105,6 @@ void CNTImeCharCommand::Execute() {
 		this->textEditingForm->current->Move(columnIndex);
 	}
 	//========== 磊悼 俺青 贸府 2 ==========
-
-	//Document 贸府
-	CodeEditingForm* codeEditingForm = (CodeEditingForm*)this->textEditingForm->GetParent();
-	codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDC_REPORT_DIRTY, 0));
 }
 
 void CNTImeCharCommand::Unexecute() {
@@ -1167,10 +1146,6 @@ void CNTImeCharCommand::Unexecute() {
 		this->textEditingForm->selection = NULL;
 		this->textEditingForm->note->UnselectAll();
 	}
-
-	//Document 贸府
-	CodeEditingForm* codeEditingForm = (CodeEditingForm*)this->textEditingForm->GetParent();
-	codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDC_REPORT_DIRTY, 0));
 }
 
 string CNTImeCharCommand::GetType() {
@@ -1277,10 +1252,6 @@ void CNTDeleteCommand::Execute() {
 		this->textEditingForm->current->Move(columnIndex);
 	}
 	//========== 磊悼 俺青 贸府 2 ==========
-
-	//Document 贸府
-	CodeEditingForm* codeEditingForm = (CodeEditingForm*)this->textEditingForm->GetParent();
-	codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDC_REPORT_DIRTY, 0));
 }
 
 void CNTDeleteCommand::Unexecute() {
@@ -1336,10 +1307,6 @@ void CNTDeleteCommand::Unexecute() {
 		this->textEditingForm->current->Move(columnIndex);
 	}
 	//========== 磊悼 俺青 贸府 2 ==========
-
-	//Document 贸府
-	CodeEditingForm* codeEditingForm = (CodeEditingForm*)this->textEditingForm->GetParent();
-	codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDC_REPORT_DIRTY, 0));
 }
 
 string CNTDeleteCommand::GetType() {
@@ -1516,10 +1483,6 @@ void CNTDeleteSelectionCommand::Execute() {
 		this->textEditingForm->current->Move(columnIndex);
 	}
 	//========== 磊悼 俺青 贸府 2 ==========
-
-	//Document 贸府
-	CodeEditingForm* codeEditingForm = (CodeEditingForm*)this->textEditingForm->GetParent();
-	codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDC_REPORT_DIRTY, 0));
 }
 
 void CNTDeleteSelectionCommand::Unexecute() {
@@ -1599,10 +1562,6 @@ void CNTDeleteSelectionCommand::Unexecute() {
 	this->textEditingForm->note->Move(this->endRow);
 	this->textEditingForm->current = this->textEditingForm->note->GetAt(this->endRow);
 	this->textEditingForm->current->Move(this->endColumn);
-
-	//Document 贸府
-	CodeEditingForm* codeEditingForm = (CodeEditingForm*)this->textEditingForm->GetParent();
-	codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDC_REPORT_DIRTY, 0));
 }
 
 string CNTDeleteSelectionCommand::GetType() {
@@ -1796,10 +1755,6 @@ void CNTPasteCommand::Execute() {
 		this->textEditingForm->current->Move(this->endColumn);
 	}
 	//========== 磊悼 俺青 贸府 2 ==========
-
-	//Document 贸府
-	CodeEditingForm* codeEditingForm = (CodeEditingForm*)this->textEditingForm->GetParent();
-	codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDC_REPORT_DIRTY, 0));
 }
 
 void CNTPasteCommand::Unexecute() {
@@ -1864,10 +1819,6 @@ void CNTPasteCommand::Unexecute() {
 		this->textEditingForm->selection = 0;
 		this->textEditingForm->note->UnselectAll();
 	}
-
-	//Document 贸府
-	CodeEditingForm* codeEditingForm = (CodeEditingForm*)this->textEditingForm->GetParent();
-	codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDC_REPORT_DIRTY, 0));
 }
 
 string CNTPasteCommand::GetType() {

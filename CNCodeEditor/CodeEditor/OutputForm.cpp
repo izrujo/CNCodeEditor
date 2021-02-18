@@ -1,9 +1,11 @@
 #include "OutputForm.h"
-#include "CodeEditingForm.h"
+#include "CodeEditor.h"
 #include "UIGraphs.h"
 #include "UIGraphFactory.h"
 #include "GraphVisitors.h"
 #include "Files.h"
+#include "CodeNumberingForm.h"
+#include "CodeEditingForm.h"
 #include "../TextEditor/TextEditingForm.h"
 #include "../TextEditor/Glyph.h"
 #include "../TextEditor/Visitor.h"
@@ -100,8 +102,19 @@ void OutputForm::OnClose() {
 
 	CRect rect;
 	this->parent->GetClientRect(rect);
-	static_cast<CodeEditingForm*>(this->parent)->textEditingForm->MoveWindow(rect);
-	static_cast<CodeEditingForm*>(this->parent)->outputForm = NULL;
+
+	CodeEditor* codeEditor = static_cast<CodeEditor*>(this->parent);
+
+	Long width = rect.Width() - CODENUMBERFORMWIDTH;
+	rect.left += CODENUMBERFORMWIDTH;
+	rect.right = rect.left + width;
+	codeEditor->codeEditingForm->MoveWindow(rect);
+
+	rect.left -= CODENUMBERFORMWIDTH;
+	rect.right = rect.left + CODENUMBERFORMWIDTH;
+	codeEditor->codeNumberingForm->MoveWindow(rect);
+
+	codeEditor->outputForm = NULL;
 
 	CWnd::OnClose();
 }
@@ -122,8 +135,19 @@ void OutputForm::OnSize(UINT nType, int cx, int cy) {
 	CRect rect;
 	this->GetClientRect(rect);
 
+	Long height = 30;
+	UIGraphFactory graphFactory;
+	if (this->windowCaption != NULL) {
+		delete this->windowCaption;
+		this->windowCaption = graphFactory.Make(WINDOWCAPTION, rect.left, rect.top, rect.Width() - height, height, "Output");
+	}
+	if (this->windowCloseButton != NULL) {
+		delete this->windowCloseButton;
+		this->windowCloseButton = graphFactory.Make(WINDOWCLOSEBUTTON, rect.right - height, rect.top, height, height);
+	}
+
 	if (this->textEditingForm != NULL) {
-		rect.top += 30;
+		rect.top += height;
 
 		this->textEditingForm->MoveWindow(rect);
 	}

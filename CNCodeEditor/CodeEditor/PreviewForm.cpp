@@ -1,10 +1,10 @@
 #include "PreviewForm.h"
-#include "CodeEditingForm.h"
+#include "CodeEditor.h"
 #include "PrintInformation.h"
 #include "Document.h"
 #include "PrintingVisitor.h"
 #include "Book.h"
-#include "../TextEditor/TextEditingForm.h"
+#include "CodeEditingForm.h"
 #include "../TextEditor/Visitor.h"
 #include "../TextEditor/Font.h"
 #include "../TextEditor/CharacterMetrics.h"
@@ -32,13 +32,13 @@ int PreviewForm::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 	this->toolBar.CreateEx(this);
 	this->toolBar.LoadToolBar(IDR_TOOLBAR1);
 
-	CodeEditingForm* codeEditingForm = static_cast<CodeEditingForm*>(this->parent);
+	CodeEditor* codeEditor = static_cast<CodeEditor*>(this->parent);
 
-	Glyph* note = codeEditingForm->textEditingForm->note->Clone();
-	if (codeEditingForm->textEditingForm->GetIsLockedHScroll() == TRUE) {
+	Glyph* note = codeEditor->codeEditingForm->note->Clone();
+	if (codeEditor->codeEditingForm->GetIsLockedHScroll() == TRUE) {
 		CRect rect;
-		codeEditingForm->textEditingForm->GetClientRect(rect);
-		DummyManager dummyManager(note, codeEditingForm->textEditingForm->characterMetrics, rect.Width());
+		codeEditor->codeEditingForm->GetClientRect(rect);
+		DummyManager dummyManager(note, codeEditor->codeEditingForm->characterMetrics, rect.Width());
 		Long i = 0;
 		while (i < note->GetLength()) {
 			dummyManager.Unfold(i);
@@ -46,7 +46,7 @@ int PreviewForm::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 		}
 	}
 
-	this->printInformation = new PrintInformation(codeEditingForm, note);
+	this->printInformation = new PrintInformation(codeEditor, note);
 
 	return 0;
 }
@@ -65,7 +65,7 @@ void PreviewForm::OnPaint() {
 	this->GetClientRect(rect);
 	dc.FillSolidRect(rect, ::GetSysColor(COLOR_3DFACE));
 
-	CodeEditingForm* codeEditingForm = static_cast<CodeEditingForm*>(this->parent);
+	CodeEditor* codeEditor = static_cast<CodeEditor*>(this->parent);
 
 	Long deviceWidth = this->printInformation->printerDC.GetDeviceCaps(PHYSICALWIDTH);
 	Long deviceHeight = this->printInformation->printerDC.GetDeviceCaps(PHYSICALHEIGHT);
@@ -77,7 +77,7 @@ void PreviewForm::OnPaint() {
 	Long x = rect.Width() / 2 - width / 2;
 	Long y = rect.Height() / 2 - height / 2;
 
-	CRect deviceMargin = codeEditingForm->document->GetMargins();
+	CRect deviceMargin = codeEditor->document->GetMargins();
 	float milimeterPerInch = 25.4F;
 	deviceMargin.left = deviceMargin.left * (SCREENDPI / milimeterPerInch);
 	deviceMargin.top = deviceMargin.top * (SCREENDPI / milimeterPerInch);
@@ -94,11 +94,11 @@ void PreviewForm::OnPaint() {
 
 	CharacterMetrics characterMetrics(this, &font);
 
-	string header = codeEditingForm->document->GetHeader();
+	string header = codeEditor->document->GetHeader();
 	if (header != "") {
 		top += characterMetrics.GetHeight();
 	}
-	string footer = codeEditingForm->document->GetFooter();
+	string footer = codeEditor->document->GetFooter();
 	if (footer != "") {
 		bottom += characterMetrics.GetHeight();
 	}
@@ -148,8 +148,8 @@ void PreviewForm::OnPaint() {
 
 void PreviewForm::OnCommandRange(UINT uID) {
 	if (uID == IDT_BUTTON_PRINT) {
-		CodeEditingForm* codeEditingForm = static_cast<CodeEditingForm*>(this->parent);
-		codeEditingForm->textEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDM_FILE_PRINT, 0));
+		CodeEditor* codeEditor = static_cast<CodeEditor*>(this->parent);
+		codeEditor->codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDM_FILE_PRINT, 0));
 		this->OnClose();
 	}
 	else if (uID == IDT_BUTTON_EXIT) {

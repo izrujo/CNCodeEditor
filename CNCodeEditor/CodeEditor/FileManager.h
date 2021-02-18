@@ -15,11 +15,11 @@ Recently Updated : 2020.07.17
 
 using namespace std;
 
-class CodeEditingForm;
+class CodeEditor;
 
 class FileManager {
 public:
-	FileManager(CodeEditingForm* codeEditingForm = 0);
+	FileManager(CodeEditor* codeEditor = 0);
 	FileManager(const FileManager& source);
 	~FileManager();
 	FileManager& operator=(const FileManager& source);
@@ -28,7 +28,7 @@ public:
 	void Load();
 	void New();
 private:
-	CodeEditingForm* codeEditingForm;
+	CodeEditor* codeEditor;
 };
 
 #endif //_FILEMANAGER_H

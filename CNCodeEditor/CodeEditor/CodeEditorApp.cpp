@@ -1,12 +1,12 @@
 #include "CodeEditorApp.h"
-#include "CodeEditingForm.h"
+#include "CodeEditor.h"
 
 BOOL CodeEditorApp::InitInstance() {
-	CodeEditingForm* codeEditingForm = new CodeEditingForm;
-	codeEditingForm->Create(NULL, "CNCodeEditor");
-	codeEditingForm->ShowWindow(SW_MAXIMIZE);
-	codeEditingForm->UpdateWindow();
-	this->m_pMainWnd = codeEditingForm;
+	CodeEditor* codeEditor = new CodeEditor;
+	codeEditor->Create(NULL, "CNCodeEditor");
+	codeEditor->ShowWindow(SW_MAXIMIZE);
+	codeEditor->UpdateWindow();
+	this->m_pMainWnd = codeEditor;
 
 	return TRUE;
 }

@@ -3,14 +3,14 @@
 
 #include <afxwin.h>
 
-class CodeEditingForm;
+class CodeEditor;
 class Glyph;
 class CharacterMetrics;
 class Font;
 
 class PrintInformation {
 public:
-	PrintInformation(CodeEditingForm* codeEditingForm = 0, Glyph* note = 0);
+	PrintInformation(CodeEditor* codeEditor = 0, Glyph* note = 0);
 	~PrintInformation();
 
 public:

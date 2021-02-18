@@ -1,5 +1,5 @@
 #include "PrintStateDialog.h"
-#include "CodeEditingForm.h"
+#include "CodeEditor.h"
 #include "Document.h"
 #include "PrintJobManager.h"
 
@@ -13,8 +13,8 @@ PrintStateDialog::PrintStateDialog(CWnd* parent)
 BOOL PrintStateDialog::OnInitDialog() {
 	CDialog::OnInitDialog();
 
-	CodeEditingForm* codeEditingForm = static_cast<CodeEditingForm*>(this->GetParent());
-	string fileName = codeEditingForm->document->GetPathName();
+	CodeEditor* codeEditor = static_cast<CodeEditor*>(this->GetParent());
+	string fileName = codeEditor->document->GetPathName();
 	//파일 이름만 남겨두기
 	int index = fileName.rfind('\\');
 	index++;
@@ -26,18 +26,18 @@ BOOL PrintStateDialog::OnInitDialog() {
 }
 
 void PrintStateDialog::OnCancel() {
-	CodeEditingForm* codeEditingForm = static_cast<CodeEditingForm*>(this->GetParent());
+	CodeEditor* codeEditor = static_cast<CodeEditor*>(this->GetParent());
 
 	//여기서 먼저 끝내놔야 스레드가 강제 종료라고 인식함.
 	//SetJob 이후에 끝내면 강제종료임에도 불구하고 정상으로 인식할 수 있음.
-	codeEditingForm->printJobManager->End();
+	codeEditor->printJobManager->End();
 
 	HANDLE hPrinter; //Printer handle variable
 	DWORD dwNeeded, dwReturned; //Mem needed, jobs found, variable for loop
 	JOB_INFO_1* pJobInfo; // pointer to structure
 
 	//Find printer handle
-	OpenPrinter((LPSTR)codeEditingForm->document->deviceMode->dmDeviceName, &hPrinter, NULL);
+	OpenPrinter((LPSTR)codeEditor->document->deviceMode->dmDeviceName, &hPrinter, NULL);
 
 	//Get amount of memory needed
 	if (!EnumJobs(hPrinter, 0, 0xFFFFFFFF, 1, NULL, 0, &dwNeeded, &dwReturned)) {
@@ -63,5 +63,5 @@ void PrintStateDialog::OnCancel() {
 
 	AfxMessageBox(_T("사용자가 작업을 취소했습니다."));
 	this->DestroyWindow();
-	codeEditingForm->printStateDialog = NULL;
+	codeEditor->printStateDialog = NULL;
 }

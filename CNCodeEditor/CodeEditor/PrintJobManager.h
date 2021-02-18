@@ -5,12 +5,12 @@
 
 typedef signed long int Long;
 
-class CodeEditingForm;
+class CodeEditor;
 class PrintStateDialog;
 
 class PrintJobManager {
 public:
-	PrintJobManager(CodeEditingForm* codeEditingForm = 0);
+	PrintJobManager(CodeEditor* codeEditor = 0);
 	PrintJobManager(const PrintJobManager& source);
 	~PrintJobManager();
 	PrintJobManager& operator=(const PrintJobManager& source);
@@ -27,7 +27,7 @@ private:
 	static UINT CheckThread(LPVOID pParam);
 
 private:
-	CodeEditingForm* codeEditingForm;
+	CodeEditor* codeEditor;
 	CWinThread* thread;
 	PrintStateDialog* printStateDialog;
 	BOOL isChecking;

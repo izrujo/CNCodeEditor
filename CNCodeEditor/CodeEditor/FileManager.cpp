@@ -1,20 +1,20 @@
 #include "FileManager.h"
 #include "Files.h"
 #include "FileFactory.h"
+#include "CodeEditor.h"
 #include "CodeEditingForm.h"
-#include "../TextEditor/TextEditingForm.h"
 #include "../TextEditor/Glyph.h"
 #include "../TextEditor/GlyphFactory.h"
 #include "../TextEditor/Scanner.h"
 #include "../TextEditor/ScrollController.h"
 #include "Document.h"
 
-FileManager::FileManager(CodeEditingForm* codeEditingForm) {
-	this->codeEditingForm = codeEditingForm;
+FileManager::FileManager(CodeEditor* codeEditor) {
+	this->codeEditor = codeEditor;
 }
 
 FileManager::FileManager(const FileManager& source) {
-	this->codeEditingForm = source.codeEditingForm;
+	this->codeEditor = source.codeEditor;
 }
 
 FileManager::~FileManager() {
@@ -22,19 +22,19 @@ FileManager::~FileManager() {
 }
 
 FileManager& FileManager::operator=(const FileManager& source) {
-	this->codeEditingForm = source.codeEditingForm;
+	this->codeEditor = source.codeEditor;
 
 	return *this;
 }
 
 void FileManager::Save() {
-	string filePathName = this->codeEditingForm->document->GetPathName();
-	string encodingType = this->codeEditingForm->document->GetEncodingType();
+	string filePathName = this->codeEditor->document->GetPathName();
+	string encodingType = this->codeEditor->document->GetEncodingType();
 
 	FileFactory fileFactory;
 	File* file = fileFactory.MakeSaveFile(filePathName, encodingType);
 
-	string content = this->codeEditingForm->textEditingForm->note->GetContent();
+	string content = this->codeEditor->codeEditingForm->note->GetContent();
 
 	file->Save(content);
 
@@ -44,65 +44,65 @@ void FileManager::Save() {
 }
 
 void FileManager::Load() {
-	string filePathName = this->codeEditingForm->document->GetPathName();
+	string filePathName = this->codeEditor->document->GetPathName();
 
 	FileFactory fileFactory;
 	File *file = fileFactory.MakeOpenFile(filePathName);
-	this->codeEditingForm->document->SetEncodingType(file->GetType());
+	this->codeEditor->document->SetEncodingType(file->GetType());
 	string content = file->Load();
 
 	if (file != 0) {
 		delete file;
 	}
 
-	if (this->codeEditingForm->textEditingForm->note != NULL) {
-		delete this->codeEditingForm->textEditingForm->note;
+	if (this->codeEditor->codeEditingForm->note != NULL) {
+		delete this->codeEditor->codeEditingForm->note;
 	}
 	GlyphFactory glyphFactory;
-	this->codeEditingForm->textEditingForm->note = glyphFactory.Make("");
-	this->codeEditingForm->textEditingForm->current = glyphFactory.Make("\r\n");
-	this->codeEditingForm->textEditingForm->note->Add(this->codeEditingForm->textEditingForm->current);
+	this->codeEditor->codeEditingForm->note = glyphFactory.Make("");
+	this->codeEditor->codeEditingForm->current = glyphFactory.Make("\r\n");
+	this->codeEditor->codeEditingForm->note->Add(this->codeEditor->codeEditingForm->current);
 	Scanner scanner(content);
 	while (scanner.IsEnd() == FALSE) {
 		string token = scanner.GetToken();
 		Glyph* glyph = glyphFactory.Make(token.c_str());
 		if (token != "\r\n") {
-			this->codeEditingForm->textEditingForm->current->Add(glyph);
+			this->codeEditor->codeEditingForm->current->Add(glyph);
 		}
 		else {
-			Long index = this->codeEditingForm->textEditingForm->note->Add(glyph);
-			this->codeEditingForm->textEditingForm->current = this->codeEditingForm->textEditingForm->note->GetAt(index);
+			Long index = this->codeEditor->codeEditingForm->note->Add(glyph);
+			this->codeEditor->codeEditingForm->current = this->codeEditor->codeEditingForm->note->GetAt(index);
 		}
 		scanner.Next();
 	}
 
-	Long index = this->codeEditingForm->textEditingForm->note->First();
-	this->codeEditingForm->textEditingForm->current = this->codeEditingForm->textEditingForm->note->GetAt(index);
-	this->codeEditingForm->textEditingForm->current->First();
+	Long index = this->codeEditor->codeEditingForm->note->First();
+	this->codeEditor->codeEditingForm->current = this->codeEditor->codeEditingForm->note->GetAt(index);
+	this->codeEditor->codeEditingForm->current->First();
 
-	if (this->codeEditingForm->textEditingForm->scrollController != NULL) {
-		delete this->codeEditingForm->textEditingForm->scrollController;
-		this->codeEditingForm->textEditingForm->scrollController = new ScrollController(this->codeEditingForm->textEditingForm);
+	if (this->codeEditor->codeEditingForm->scrollController != NULL) {
+		delete this->codeEditor->codeEditingForm->scrollController;
+		this->codeEditor->codeEditingForm->scrollController = new ScrollController(this->codeEditor->codeEditingForm);
 	}
-	this->codeEditingForm->textEditingForm->Notify();
+	this->codeEditor->codeEditingForm->Notify();
 }
 
 void FileManager::New() {
-	if (this->codeEditingForm->textEditingForm->note != NULL) {
-		delete this->codeEditingForm->textEditingForm->note;
+	if (this->codeEditor->codeEditingForm->note != NULL) {
+		delete this->codeEditor->codeEditingForm->note;
 	}
 	GlyphFactory glyphFactory;
-	this->codeEditingForm->textEditingForm->note = glyphFactory.Make("");
+	this->codeEditor->codeEditingForm->note = glyphFactory.Make("");
 	Glyph* line = glyphFactory.Make("\r\n");
-	this->codeEditingForm->textEditingForm->note->Add(line);
+	this->codeEditor->codeEditingForm->note->Add(line);
 
-	Long index = this->codeEditingForm->textEditingForm->note->First();
-	this->codeEditingForm->textEditingForm->current = this->codeEditingForm->textEditingForm->note->GetAt(index);
-	this->codeEditingForm->textEditingForm->current->First();
+	Long index = this->codeEditor->codeEditingForm->note->First();
+	this->codeEditor->codeEditingForm->current = this->codeEditor->codeEditingForm->note->GetAt(index);
+	this->codeEditor->codeEditingForm->current->First();
 
-	if (this->codeEditingForm->textEditingForm->scrollController != NULL) {
-		delete this->codeEditingForm->textEditingForm->scrollController;
-		this->codeEditingForm->textEditingForm->scrollController = new ScrollController(this->codeEditingForm->textEditingForm);
+	if (this->codeEditor->codeEditingForm->scrollController != NULL) {
+		delete this->codeEditor->codeEditingForm->scrollController;
+		this->codeEditor->codeEditingForm->scrollController = new ScrollController(this->codeEditor->codeEditingForm);
 	}
-	this->codeEditingForm->textEditingForm->Notify();
+	this->codeEditor->codeEditingForm->Notify();
 }

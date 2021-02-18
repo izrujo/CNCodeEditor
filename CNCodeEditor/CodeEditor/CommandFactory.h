@@ -11,19 +11,19 @@ Recently Updated : 2019.05
 #ifndef _COMMANDFACTORY_H
 #define _COMMANDFACTORY_H
 
-class CodeEditingForm;
+class CodeEditor;
 class Command;
 
 class CommandFactory {
 public:
-	CommandFactory(CodeEditingForm* codeEditingForm = 0);
+	CommandFactory(CodeEditor* codeEditor = 0);
 	CommandFactory(const CommandFactory& source);
 	~CommandFactory();
 	CommandFactory& operator=(const CommandFactory& source);
 
 	Command* Make(int uID);
 private:
-	CodeEditingForm* codeEditingForm;
+	CodeEditor* codeEditor;
 };
 
 #endif //_COMMANDFACTORY_H

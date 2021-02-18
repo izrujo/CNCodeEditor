@@ -319,51 +319,6 @@ public:
 	CNTCtrlHKeyAction& operator =(const CNTCtrlHKeyAction& source);
 };
 
-class CNTCtrlNKeyAction : public CNTKeyAction {
-public:
-	CNTCtrlNKeyAction(TextEditingForm* textEditingForm = 0);
-	CNTCtrlNKeyAction(const CNTCtrlNKeyAction& source);
-	virtual ~CNTCtrlNKeyAction();
-	virtual void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
-	CNTCtrlNKeyAction& operator =(const CNTCtrlNKeyAction& source);
-};
-
-class CNTCtrlOKeyAction : public CNTKeyAction {
-public:
-	CNTCtrlOKeyAction(TextEditingForm* textEditingForm = 0);
-	CNTCtrlOKeyAction(const CNTCtrlOKeyAction& source);
-	virtual ~CNTCtrlOKeyAction();
-	virtual void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
-	CNTCtrlOKeyAction& operator =(const CNTCtrlOKeyAction& source);
-};
-
-class CNTCtrlSKeyAction : public CNTKeyAction {
-public:
-	CNTCtrlSKeyAction(TextEditingForm* textEditingForm = 0);
-	CNTCtrlSKeyAction(const CNTCtrlSKeyAction& source);
-	virtual ~CNTCtrlSKeyAction();
-	virtual void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
-	CNTCtrlSKeyAction& operator =(const CNTCtrlSKeyAction& source);
-};
-
-class CNTCtrlShiftSKeyAction : public CNTKeyAction {
-public:
-	CNTCtrlShiftSKeyAction(TextEditingForm* textEditingForm = 0);
-	CNTCtrlShiftSKeyAction(const CNTCtrlShiftSKeyAction& source);
-	virtual ~CNTCtrlShiftSKeyAction();
-	virtual void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
-	CNTCtrlShiftSKeyAction& operator =(const CNTCtrlShiftSKeyAction& source);
-};
-
-class CNTCtrlPKeyAction : public CNTKeyAction {
-public:
-	CNTCtrlPKeyAction(TextEditingForm* textEditingForm = 0);
-	CNTCtrlPKeyAction(const CNTCtrlPKeyAction& source);
-	virtual ~CNTCtrlPKeyAction();
-	virtual void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
-	CNTCtrlPKeyAction& operator =(const CNTCtrlPKeyAction& source);
-};
-
 //임시 - 자동개행 LockHScroll
 class CNTCtrlF1KeyAction : public CNTKeyAction {
 public:
@@ -392,26 +347,6 @@ public:
 	virtual ~CNTCtrlF3KeyAction();
 	virtual void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	CNTCtrlF3KeyAction& operator =(const CNTCtrlF3KeyAction& source);
-};
-
-//CNTCtrlF5KeyAction
-class CNTCtrlF5KeyAction : public CNTKeyAction {
-public:
-	CNTCtrlF5KeyAction(TextEditingForm* textEditingForm = 0);
-	CNTCtrlF5KeyAction(const CNTCtrlF5KeyAction& source);
-	virtual ~CNTCtrlF5KeyAction();
-	virtual void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
-	CNTCtrlF5KeyAction& operator =(const CNTCtrlF5KeyAction& source);
-};
-
-//CNTCtrlF7KeyAction
-class CNTCtrlF7KeyAction : public CNTKeyAction {
-public:
-	CNTCtrlF7KeyAction(TextEditingForm* textEditingForm = 0);
-	CNTCtrlF7KeyAction(const CNTCtrlF7KeyAction& source);
-	virtual ~CNTCtrlF7KeyAction();
-	virtual void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
-	CNTCtrlF7KeyAction& operator =(const CNTCtrlF7KeyAction& source);
 };
 
 #endif //_CNTKEYACTIONS_H

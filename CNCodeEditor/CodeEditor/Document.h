@@ -17,11 +17,11 @@ Recently Updated : 2020.07.17
 using namespace std;
 typedef signed long int Long;
 
-class CodeEditingForm;
+class CodeEditor;
 
 class Document {
 public:
-	Document(CodeEditingForm* codeEditingForm = 0);
+	Document(CodeEditor* codeEditor = 0);
 	Document(const Document& source);
 	~Document();
 	Document& operator=(const Document& source);
@@ -49,7 +49,7 @@ public:
 	DEVMODE *deviceMode;
 
 private:
-	CodeEditingForm* codeEditingForm;
+	CodeEditor* codeEditor;
 	bool isDirty;
 	string pathName;
 	string encodingType;

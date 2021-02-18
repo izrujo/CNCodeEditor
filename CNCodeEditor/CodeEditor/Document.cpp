@@ -1,15 +1,15 @@
 #include "Document.h"
-#include "CodeEditingForm.h"
+#include "CodeEditor.h"
 #include <afxdlgs.h>
 
-Document::Document(CodeEditingForm* codeEditingForm) 
+Document::Document(CodeEditor* codeEditor) 
 	: pathName("제목 없음"), encodingType("ANSI"), 
 	/*paperSize(21000, 29700),*/ margins(20, 25, 20, 25), header(""), footer("") {
-	this->codeEditingForm = codeEditingForm;
+	this->codeEditor = codeEditor;
 	this->isDirty = false;
 	this->isVertical = true;
 
-	CPrintDialog printDialog(FALSE, PD_ALLPAGES | PD_USEDEVMODECOPIES | PD_NOPAGENUMS | PD_HIDEPRINTTOFILE | PD_NOSELECTION | PD_RETURNDEFAULT, codeEditingForm);
+	CPrintDialog printDialog(FALSE, PD_ALLPAGES | PD_USEDEVMODECOPIES | PD_NOPAGENUMS | PD_HIDEPRINTTOFILE | PD_NOSELECTION | PD_RETURNDEFAULT, codeEditor);
 	printDialog.GetDefaults();
 	this->deviceMode = printDialog.GetDevMode();
 }
@@ -17,7 +17,7 @@ Document::Document(CodeEditingForm* codeEditingForm)
 Document::Document(const Document& source) 
 	: pathName(source.pathName), encodingType(source.encodingType), 
 	/*paperSize(source.paperSize),*/ margins(source.margins), header(source.header), footer(source.footer) {
-	this->codeEditingForm = source.codeEditingForm;
+	this->codeEditor = source.codeEditor;
 	this->isDirty = source.isDirty;
 	this->isVertical = source.isVertical;
 	this->deviceMode = source.deviceMode;
@@ -27,7 +27,7 @@ Document::~Document() {
 }
 
 Document& Document::operator=(const Document& source) {
-	this->codeEditingForm = source.codeEditingForm;
+	this->codeEditor = source.codeEditor;
 	this->isDirty = source.isDirty;
 	this->pathName = source.pathName;
 	this->encodingType = source.encodingType;

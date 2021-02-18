@@ -24,6 +24,9 @@ UIGraph* UIGraphFactory::Make(int id, Long x, Long y, Long width, Long height, s
 	else if (id == WINDOWCLOSEBUTTON) {
 		uiGraph = new WindowCloseButton(x, y, width, height, content);
 	}
+	else if (id == LINENUMBER) {
+		uiGraph = new LineNumber(x, y, width, height, content);
+	}
 
 	return uiGraph;
 }

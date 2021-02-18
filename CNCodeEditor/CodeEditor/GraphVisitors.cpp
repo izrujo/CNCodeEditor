@@ -66,3 +66,30 @@ void GraphDrawingVisitor::Visit(WindowCloseButton* element) {
 
 	this->dc->SelectObject(oldPen);
 }
+
+void GraphDrawingVisitor::Visit(NumberStick* element) {
+	Long i = 0;
+	while (i < element->GetLength()) {
+		element->GetAt(i)->Accept(this);
+		i++;
+	}
+}
+
+void GraphDrawingVisitor::Visit(LineNumber* element) {
+	Long x = element->GetX();
+	Long y = element->GetY();
+	Long width = element->GetWidth();
+	Long height = element->GetHeight();
+
+	CFont* font = this->dc->GetCurrentFont();
+	LOGFONT logFont;
+	font->GetLogFont(&logFont);
+	logFont.lfHeight = height;
+	Long contentHeight = logFont.lfHeight;
+	CRect rect(x, y + (height - contentHeight) / 2, x + width - 10, y + height);
+	this->dc->DrawText(element->GetContent().c_str(), rect, DT_RIGHT | DT_VCENTER);
+}
+
+//void GraphDrawingVisitor::Visit(UIGraph* element) {
+//	함수 추가 복사용
+//}

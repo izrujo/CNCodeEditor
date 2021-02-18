@@ -1,5 +1,5 @@
 #include "Printer.h"
-#include "CodeEditingForm.h"
+#include "CodeEditor.h"
 #include "PrintInformation.h"
 #include "Document.h"
 #include "PrintingVisitor.h"
@@ -10,13 +10,13 @@
 
 #include <afxwin.h>
 
-Printer::Printer(CodeEditingForm* codeEditingForm, PrintInformation *printInformation) {
-	this->codeEditingForm = codeEditingForm;
+Printer::Printer(CodeEditor* codeEditor, PrintInformation *printInformation) {
+	this->codeEditor = codeEditor;
 	this->printInformation = printInformation;
 }
 
 Printer::Printer(const Printer& source) {
-	this->codeEditingForm = source.codeEditingForm;
+	this->codeEditor = source.codeEditor;
 	this->printInformation = source.printInformation;
 }
 
@@ -25,7 +25,7 @@ Printer::~Printer() {
 }
 
 Printer& Printer::operator=(const Printer& source) {
-	this->codeEditingForm = source.codeEditingForm;
+	this->codeEditor = source.codeEditor;
 	this->printInformation = source.printInformation;
 
 	return *this;
@@ -36,7 +36,7 @@ void Printer::Print() {
 	Long deviceHeight = this->printInformation->printerDC.GetDeviceCaps(PHYSICALHEIGHT);
 	Long dpi = this->printInformation->printerDC.GetDeviceCaps(LOGPIXELSX);
 
-	CRect deviceMargin = this->codeEditingForm->document->GetMargins();
+	CRect deviceMargin = this->codeEditor->document->GetMargins();
 	float milimeterPerInch = 25.4F;
 	deviceMargin.left = deviceMargin.left * (dpi / milimeterPerInch);
 	deviceMargin.top = deviceMargin.top * (dpi / milimeterPerInch);
@@ -45,11 +45,11 @@ void Printer::Print() {
 	Long top = deviceMargin.top;
 	Long bottom = deviceMargin.bottom;
 
-	string header = this->codeEditingForm->document->GetHeader();
+	string header = this->codeEditor->document->GetHeader();
 	if (header != "") {
 		top += this->printInformation->characterMetrics->GetHeight();
 	}
-	string footer = this->codeEditingForm->document->GetFooter();
+	string footer = this->codeEditor->document->GetFooter();
 	if (footer != "") {
 		bottom += this->printInformation->characterMetrics->GetHeight();
 	}

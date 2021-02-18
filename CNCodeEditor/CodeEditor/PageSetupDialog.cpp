@@ -1,5 +1,5 @@
 #include "PageSetupDialog.h"
-#include "CodeEditingForm.h"
+#include "CodeEditor.h"
 #include "Document.h"
 #include "resource.h"
 
@@ -14,7 +14,7 @@ PageSetupDialog::PageSetupDialog(CWnd* parent) {
 	this->psd.lpfnPageSetupHook = (LPPAGESETUPHOOK)pageSetupHookFunction;
 	this->psd.hInstance = AfxGetInstanceHandle();
 	
-	CodeEditingForm* codeEditingForm = static_cast<CodeEditingForm*>(parent);
+	CodeEditor* codeEditor = static_cast<CodeEditor*>(parent);
 
 	this->psd.hDevMode = GlobalAlloc(GHND, sizeof(DEVMODE)); // 이동 가능한 메모리 블록을 할당하고 0으로 초기화합니다.
 	if (this->psd.hDevMode) {
@@ -22,16 +22,16 @@ PageSetupDialog::PageSetupDialog(CWnd* parent) {
 		if (pDevMode) {
 			pDevMode->dmSize = sizeof(DEVMODE); // DEVMODE 구조의 크기를 설정합니다.
 			pDevMode->dmFields = DM_ORIENTATION; // dmOrientation 필드를 설정할 것임을 Windows에알립니다.
-			(codeEditingForm->document->GetIsVertical()) ?
+			(codeEditor->document->GetIsVertical()) ?
 				(pDevMode->dmOrientation = DMORIENT_PORTRAIT) : (pDevMode->dmOrientation = DMORIENT_LANDSCAPE);
 		}
 		GlobalUnlock(this->psd.hDevMode); // 다른 함수가 이것을 사용할 수 있도록 메모리 잠금을 해제합니다.
 	}
 
-	this->psd.rtMargin.left = codeEditingForm->document->GetMargins().left * 100;
-	this->psd.rtMargin.top = codeEditingForm->document->GetMargins().top * 100;
-	this->psd.rtMargin.right = codeEditingForm->document->GetMargins().right * 100;
-	this->psd.rtMargin.bottom = codeEditingForm->document->GetMargins().bottom * 100;
+	this->psd.rtMargin.left = codeEditor->document->GetMargins().left * 100;
+	this->psd.rtMargin.top = codeEditor->document->GetMargins().top * 100;
+	this->psd.rtMargin.right = codeEditor->document->GetMargins().right * 100;
+	this->psd.rtMargin.bottom = codeEditor->document->GetMargins().bottom * 100;
 }
 
 BOOL PageSetupDialog::DoModal() {
@@ -39,20 +39,20 @@ BOOL PageSetupDialog::DoModal() {
 }
 
 UINT APIENTRY PageSetupHook(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lParam) {
-	CodeEditingForm* codeEditingForm = static_cast<CodeEditingForm*>(CWnd::FromHandle(hdlg)->GetParent());
+	CodeEditor* codeEditor = static_cast<CodeEditor*>(CWnd::FromHandle(hdlg)->GetParent());
 
 	/*CSize sizes[10] =
 	{ CSize(29700, 42000), CSize(21000, 29700), CSize(14800, 21000), CSize(25700, 36400), CSize(18200, 25700),
 	CSize(18410, 26670), CSize(21590, 35560), CSize(21590, 27940), CSize(13970, 21590), CSize(27940, 43180) };*/
 
 	if (uiMsg == WM_INITDIALOG) {
-		string header = codeEditingForm->document->GetHeader();
-		string footer = codeEditingForm->document->GetFooter();
+		string header = codeEditor->document->GetHeader();
+		string footer = codeEditor->document->GetFooter();
 		CWnd::FromHandle(GetDlgItem(hdlg, IDC_EDIT_HEADER))->SetWindowTextA(header.c_str());
 		CWnd::FromHandle(GetDlgItem(hdlg, IDC_EDIT_FOOTER))->SetWindowTextA(footer.c_str());
 	
 		//10.05 갑자기 이 기능이 자동으로 되네요?
-		//CSize paperSize = CodeEditingForm->document->GetPaperSize();
+		//CSize paperSize = CodeEditor->document->GetPaperSize();
 		//Long i = 0;
 		//while (i < 10 && sizes[i] != paperSize) {			
 		//	i++;
@@ -67,7 +67,7 @@ UINT APIENTRY PageSetupHook(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 		CWnd::FromHandle(GetDlgItem(hdlg, 1137))->GetWindowTextA(size);
 		int index = ((CComboBox*)CWnd::FromHandle(GetDlgItem(hdlg, 1137)))->FindString(0, size);
 		paperSize = sizes[index];
-		CodeEditingForm->document->SetPaperSize(paperSize);*/
+		CodeEditor->document->SetPaperSize(paperSize);*/
 
 		bool isVertical;
 		int selectedRadio = CWnd::FromHandle(hdlg)->GetCheckedRadioButton(1056, 1057);
@@ -77,7 +77,7 @@ UINT APIENTRY PageSetupHook(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 		else {
 			isVertical = false;
 		}
-		codeEditingForm->document->SetIsVertical(isVertical);
+		codeEditor->document->SetIsVertical(isVertical);
 
 		CRect margins;
 		CString margin;
@@ -89,14 +89,14 @@ UINT APIENTRY PageSetupHook(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 		margins.top = atoi(margin);
 		CWnd::FromHandle(GetDlgItem(hdlg, 1158))->GetWindowTextA(margin);
 		margins.bottom = atoi(margin);
-		codeEditingForm->document->SetMargins(margins);
+		codeEditor->document->SetMargins(margins);
 		
 		CString header;
 		CString footer;
 		CWnd::FromHandle(GetDlgItem(hdlg, IDC_EDIT_HEADER))->GetWindowTextA(header);
 		CWnd::FromHandle(GetDlgItem(hdlg, IDC_EDIT_FOOTER))->GetWindowTextA(footer);
-		codeEditingForm->document->SetHeader((LPCTSTR)header);
-		codeEditingForm->document->SetFooter((LPCTSTR)footer);
+		codeEditor->document->SetHeader((LPCTSTR)header);
+		codeEditor->document->SetFooter((LPCTSTR)footer);
 	}
 
 	return 0;

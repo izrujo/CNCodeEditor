@@ -1,5 +1,5 @@
 #include "PrintJobManager.h"
-#include "CodeEditingForm.h"
+#include "CodeEditor.h"
 #include "Document.h"
 #include <afxwin.h>
 #include "PrintingVisitor.h"
@@ -7,8 +7,8 @@
 
 #include <winspool.h>
 
-PrintJobManager::PrintJobManager(CodeEditingForm* codeEditingForm) {
-	this->codeEditingForm = codeEditingForm;
+PrintJobManager::PrintJobManager(CodeEditor* codeEditor) {
+	this->codeEditor = codeEditor;
 	this->thread = NULL;
 	this->printStateDialog = NULL;
 	this->isChecking = FALSE;
@@ -16,7 +16,7 @@ PrintJobManager::PrintJobManager(CodeEditingForm* codeEditingForm) {
 }
 
 PrintJobManager::PrintJobManager(const PrintJobManager& source) {
-	this->codeEditingForm = source.codeEditingForm;
+	this->codeEditor = source.codeEditor;
 	this->thread = source.thread;
 	this->printStateDialog = source.printStateDialog;
 	this->isChecking = source.isChecking;
@@ -36,7 +36,7 @@ PrintJobManager::~PrintJobManager() {
 }
 
 PrintJobManager& PrintJobManager::operator=(const PrintJobManager& source) {
-	this->codeEditingForm = source.codeEditingForm;
+	this->codeEditor = source.codeEditor;
 	this->thread = source.thread;
 	this->printStateDialog = source.printStateDialog;
 	this->isChecking = source.isChecking;
@@ -85,7 +85,7 @@ UINT PrintJobManager::CheckThread(LPVOID pParam) {
 	JOB_INFO_1* pJobInfo; // pointer to structure
 
 	//Find printer handle
-	OpenPrinter((LPSTR)printJobManager->codeEditingForm->document->deviceMode->dmDeviceName, &hPrinter, NULL);
+	OpenPrinter((LPSTR)printJobManager->codeEditor->document->deviceMode->dmDeviceName, &hPrinter, NULL);
 
 	//Get amount of memory needed
 	EnumJobs(hPrinter, 0, 0xFFFFFFFF, 1, NULL, 0, &dwNeeded, &dwReturned);
@@ -102,7 +102,7 @@ UINT PrintJobManager::CheckThread(LPVOID pParam) {
 	free(pJobInfo);
 
 	if (dwReturned <= 0 && printJobManager->isChecking == TRUE) {
-		printJobManager->codeEditingForm->SendMessage(WM_THREADNOTIFY, 0, 0);
+		printJobManager->codeEditor->SendMessage(WM_THREADNOTIFY, 0, 0);
 	}
 
 	printJobManager->isChecking = FALSE;

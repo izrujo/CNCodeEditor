@@ -5,6 +5,8 @@
 
 class WindowCaption;
 class WindowCloseButton;
+class NumberStick;
+class LineNumber;
 
 class GraphVisitor {
 public:
@@ -13,6 +15,8 @@ public:
 
 	virtual void Visit(WindowCaption* element) = 0;
 	virtual void Visit(WindowCloseButton* element) = 0;
+	virtual void Visit(NumberStick* element) = 0;
+	virtual void Visit(LineNumber* element) = 0;
 };
 
 //GraphDrawingVisitor
@@ -23,6 +27,8 @@ public:
 
 	virtual void Visit(WindowCaption* element);
 	virtual void Visit(WindowCloseButton* element);
+	virtual void Visit(NumberStick* element);
+	virtual void Visit(LineNumber* element);
 
 private:
 	CDC* dc;

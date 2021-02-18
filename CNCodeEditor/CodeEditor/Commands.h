@@ -16,14 +16,14 @@ Recently Updated : 2020.07.17
 #include "../Utilities/Array.h"
 using namespace std;
 
-class CodeEditingForm;
+class CodeEditor;
 class Glyph;
 class Note;
 
 //Command
 class Command {
 public:
-	Command(CodeEditingForm* codeEditingForm = 0);
+	Command(CodeEditor* codeEditor = 0);
 	Command(const Command& source);
 	virtual ~Command() = 0;
 	Command& operator=(const Command& source);
@@ -34,13 +34,13 @@ public:
 	virtual Command* Clone() = 0;
 
 protected:
-	CodeEditingForm* codeEditingForm;
+	CodeEditor* codeEditor;
 };
 
 //FontCommand
 class FontCommand : public Command {
 public:
-	FontCommand(CodeEditingForm *codeEditingForm = 0);
+	FontCommand(CodeEditor *codeEditor = 0);
 	FontCommand(const FontCommand& source);
 	~FontCommand();
 	FontCommand& operator=(const FontCommand& source);
@@ -53,7 +53,7 @@ public:
 //NewCommand
 class NewCommand : public Command {
 public:
-	NewCommand(CodeEditingForm *codeEditingForm = 0);
+	NewCommand(CodeEditor *codeEditor = 0);
 	NewCommand(const NewCommand& source);
 	virtual ~NewCommand();
 	NewCommand& operator=(const NewCommand& source);
@@ -66,7 +66,7 @@ public:
 //OpenCommand
 class OpenCommand : public Command {
 public:
-	OpenCommand(CodeEditingForm *codeEditingForm = 0);
+	OpenCommand(CodeEditor *codeEditor = 0);
 	OpenCommand(const OpenCommand& source);
 	virtual ~OpenCommand();
 	OpenCommand& operator=(const OpenCommand& source);
@@ -79,7 +79,7 @@ public:
 //SaveCommand
 class SaveCommand : public Command {
 public:
-	SaveCommand(CodeEditingForm* codeEditingForm = 0);
+	SaveCommand(CodeEditor* codeEditor = 0);
 	SaveCommand(const SaveCommand& source);
 	virtual ~SaveCommand();
 	SaveCommand& operator=(const SaveCommand& source);
@@ -92,7 +92,7 @@ public:
 //SaveAsCommand
 class SaveAsCommand : public Command {
 public:
-	SaveAsCommand(CodeEditingForm* codeEditingForm = 0);
+	SaveAsCommand(CodeEditor* codeEditor = 0);
 	SaveAsCommand(const SaveAsCommand& source);
 	virtual ~SaveAsCommand();
 	SaveAsCommand& operator=(const SaveAsCommand& source);
@@ -105,7 +105,7 @@ public:
 //CloseCommand
 class CloseCommand : public Command {
 public:
-	CloseCommand(CodeEditingForm* codeEditingForm = 0);
+	CloseCommand(CodeEditor* codeEditor = 0);
 	CloseCommand(const CloseCommand& source);
 	virtual ~CloseCommand();
 	CloseCommand& operator=(const CloseCommand& source);
@@ -118,7 +118,7 @@ public:
 //PageSetupCommand
 class PageSetupCommand : public Command {
 public:
-	PageSetupCommand(CodeEditingForm* codeEditingForm = 0);
+	PageSetupCommand(CodeEditor* codeEditor = 0);
 	PageSetupCommand(const PageSetupCommand& source);
 	virtual ~PageSetupCommand();
 	PageSetupCommand& operator=(const PageSetupCommand& source);
@@ -131,7 +131,7 @@ public:
 //PrintCommand
 class PrintCommand : public Command {
 public:
-	PrintCommand(CodeEditingForm* codeEditingForm = 0);
+	PrintCommand(CodeEditor* codeEditor = 0);
 	PrintCommand(const PrintCommand& source);
 	virtual ~PrintCommand();
 	PrintCommand& operator=(const PrintCommand& source);
@@ -144,7 +144,7 @@ public:
 //PreviewCommand
 class PreviewCommand : public Command {
 public:
-	PreviewCommand(CodeEditingForm* codeEditingForm = 0);
+	PreviewCommand(CodeEditor* codeEditor = 0);
 	PreviewCommand(const PreviewCommand& source);
 	virtual ~PreviewCommand();
 	PreviewCommand& operator=(const PreviewCommand& source);
@@ -157,7 +157,7 @@ public:
 //CopyCommand
 class CopyCommand : public Command {
 public:
-	CopyCommand(CodeEditingForm* codeEditingForm = 0);
+	CopyCommand(CodeEditor* codeEditor = 0);
 	CopyCommand(const CopyCommand& source);
 	virtual ~CopyCommand();
 	CopyCommand& operator=(const CopyCommand& source);
@@ -170,7 +170,7 @@ public:
 //PasteCommand
 class PasteCommand : public Command {
 public:
-	PasteCommand(CodeEditingForm* codeEditingForm = 0);
+	PasteCommand(CodeEditor* codeEditor = 0);
 	PasteCommand(const PasteCommand& source);
 	virtual ~PasteCommand();
 	PasteCommand& operator=(const PasteCommand& source);
@@ -183,7 +183,7 @@ public:
 //CutCommand
 class CutCommand : public Command {
 public:
-	CutCommand(CodeEditingForm* codeEditingForm = 0);
+	CutCommand(CodeEditor* codeEditor = 0);
 	CutCommand(const CutCommand& source);
 	virtual ~CutCommand();
 	CutCommand& operator=(const CutCommand& source);
@@ -196,7 +196,7 @@ public:
 //SelectAllCommand
 class SelectAllCommand : public Command {
 public:
-	SelectAllCommand(CodeEditingForm* codeEditingForm = 0);
+	SelectAllCommand(CodeEditor* codeEditor = 0);
 	SelectAllCommand(const SelectAllCommand& source);
 	virtual ~SelectAllCommand();
 	SelectAllCommand& operator=(const SelectAllCommand& source);
@@ -209,7 +209,7 @@ public:
 //DeleteSelectionCommand
 class DeleteSelectionCommand : public Command {
 public:
-	DeleteSelectionCommand(CodeEditingForm* codeEditingForm = 0);
+	DeleteSelectionCommand(CodeEditor* codeEditor = 0);
 	DeleteSelectionCommand(const DeleteSelectionCommand& source);
 	virtual ~DeleteSelectionCommand();
 	DeleteSelectionCommand& operator=(const DeleteSelectionCommand& source);
@@ -222,7 +222,7 @@ public:
 //UndoCommand
 class UndoCommand : public Command {
 public:
-	UndoCommand(CodeEditingForm* codeEditingForm = 0);
+	UndoCommand(CodeEditor* codeEditor = 0);
 	UndoCommand(const UndoCommand& source);
 	virtual ~UndoCommand();
 	UndoCommand& operator=(const UndoCommand& source);
@@ -235,7 +235,7 @@ public:
 //RedoCommand
 class RedoCommand : public Command {
 public:
-	RedoCommand(CodeEditingForm* codeEditingForm = 0);
+	RedoCommand(CodeEditor* codeEditor = 0);
 	RedoCommand(const RedoCommand& source);
 	virtual ~RedoCommand();
 	RedoCommand& operator=(const RedoCommand& source);
@@ -248,7 +248,7 @@ public:
 //FindCommand
 class FindCommand : public Command {
 public:
-	FindCommand(CodeEditingForm* codeEditingForm = 0);
+	FindCommand(CodeEditor* codeEditor = 0);
 	FindCommand(const FindCommand& source);
 	virtual ~FindCommand();
 	FindCommand& operator=(const FindCommand& source);
@@ -261,7 +261,7 @@ public:
 //ReplaceCommand
 class ReplaceCommand : public Command {
 public:
-	ReplaceCommand(CodeEditingForm* codeEditingForm = 0);
+	ReplaceCommand(CodeEditor* codeEditor = 0);
 	ReplaceCommand(const ReplaceCommand& source);
 	virtual ~ReplaceCommand();
 	ReplaceCommand& operator=(const ReplaceCommand& source);
@@ -274,7 +274,7 @@ public:
 //ReportDirtyCommand
 class ReportDirtyCommand : public Command {
 public:
-	ReportDirtyCommand(CodeEditingForm* codeEditingForm = 0);
+	ReportDirtyCommand(CodeEditor* codeEditor = 0);
 	ReportDirtyCommand(const ReportDirtyCommand& source);
 	virtual ~ReportDirtyCommand();
 	ReportDirtyCommand& operator=(const ReportDirtyCommand& source);
@@ -287,7 +287,7 @@ public:
 //CCompileCommand
 class CCompileCommand : public Command {
 public:
-	CCompileCommand(CodeEditingForm* codeEditingForm = 0);
+	CCompileCommand(CodeEditor* codeEditor = 0);
 	CCompileCommand(const CCompileCommand& source);
 	virtual ~CCompileCommand();
 	CCompileCommand& operator=(const CCompileCommand& source);
@@ -300,7 +300,7 @@ public:
 //CLinkCommand
 class CLinkCommand : public Command {
 public:
-	CLinkCommand(CodeEditingForm* codeEditingForm = 0);
+	CLinkCommand(CodeEditor* codeEditor = 0);
 	CLinkCommand(const CLinkCommand& source);
 	virtual ~CLinkCommand();
 	CLinkCommand& operator=(const CLinkCommand& source);
@@ -313,7 +313,7 @@ public:
 //CLoadCommand
 class CLoadCommand : public Command {
 public:
-	CLoadCommand(CodeEditingForm* codeEditingForm = 0);
+	CLoadCommand(CodeEditor* codeEditor = 0);
 	CLoadCommand(const CLoadCommand& source);
 	virtual ~CLoadCommand();
 	CLoadCommand& operator=(const CLoadCommand& source);

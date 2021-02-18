@@ -142,9 +142,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CodeEditor\Book.h" />
+    <ClInclude Include="CodeEditor\CodeEditingForm.h" />
+    <ClInclude Include="CodeEditor\CodeNumberingForm.h" />
     <ClInclude Include="CodeEditor\CommandFactory.h" />
     <ClInclude Include="CodeEditor\Commands.h" />
     <ClInclude Include="CodeEditor\GraphVisitors.h" />
+    <ClInclude Include="CodeEditor\KeyActionFactory.h" />
+    <ClInclude Include="CodeEditor\KeyActions.h" />
     <ClInclude Include="CodeEditor\OutputForm.h" />
     <ClInclude Include="CodeEditor\Document.h" />
     <ClInclude Include="CodeEditor\FileDialog.h" />
@@ -152,7 +156,7 @@
     <ClInclude Include="CodeEditor\FileManager.h" />
     <ClInclude Include="CodeEditor\Files.h" />
     <ClInclude Include="CodeEditor\CodeEditorApp.h" />
-    <ClInclude Include="CodeEditor\CodeEditingForm.h" />
+    <ClInclude Include="CodeEditor\CodeEditor.h" />
     <ClInclude Include="CodeEditor\PageSetupDialog.h" />
     <ClInclude Include="CodeEditor\PreviewForm.h" />
     <ClInclude Include="CodeEditor\Printer.h" />
@@ -201,9 +205,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CodeEditor\Book.cpp" />
+    <ClCompile Include="CodeEditor\CodeEditingForm.cpp" />
+    <ClCompile Include="CodeEditor\CodeNumberingForm.cpp" />
     <ClCompile Include="CodeEditor\CommandFactory.cpp" />
     <ClCompile Include="CodeEditor\Commands.cpp" />
     <ClCompile Include="CodeEditor\GraphVisitors.cpp" />
+    <ClCompile Include="CodeEditor\KeyActionFactory.cpp" />
+    <ClCompile Include="CodeEditor\KeyActions.cpp" />
     <ClCompile Include="CodeEditor\OutputForm.cpp" />
     <ClCompile Include="CodeEditor\Document.cpp" />
     <ClCompile Include="CodeEditor\FileDialog.cpp" />
@@ -211,7 +219,7 @@
     <ClCompile Include="CodeEditor\FileManager.cpp" />
     <ClCompile Include="CodeEditor\Files.cpp" />
     <ClCompile Include="CodeEditor\CodeEditorApp.cpp" />
-    <ClCompile Include="CodeEditor\CodeEditingForm.cpp" />
+    <ClCompile Include="CodeEditor\CodeEditor.cpp" />
     <ClCompile Include="CodeEditor\PageSetupDialog.cpp" />
     <ClCompile Include="CodeEditor\PreviewForm.cpp" />
     <ClCompile Include="CodeEditor\Printer.cpp" />
