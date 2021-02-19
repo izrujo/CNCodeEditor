@@ -67,8 +67,8 @@ int CodeEditor::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 	this->codeEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_FLAG_UNLOCKFINDREPLACEDIALOG, 0));
 
 	rect.left -= CODENUMBERFORMWIDTH;
-	rect.right = rect.left + CODENUMBERFORMWIDTH - 5;
-	rect.bottom -= 26; //수평 스크롤 바 높이.
+	rect.right = rect.left + CODENUMBERFORMWIDTH - 2;
+	rect.bottom -= 25; //수평 스크롤 바 높이.
 	this->codeNumberingForm = new CodeNumberingForm(this);
 	this->codeNumberingForm->Create(NULL, "CodeNumber", WS_CHILD,
 		rect, this, NULL, NULL);
@@ -117,14 +117,20 @@ void CodeEditor::OnPaint() {
 	CRect numberingFormRect;
 	this->codeNumberingForm->GetClientRect(numberingFormRect);
 
-	CPen pen(PS_SOLID, 1, RGB(0, 0, 0));
-	CPen* oldPen = dc.SelectObject(&pen);
+	CRect rect;
+	this->GetClientRect(rect);
+	if (this->outputForm != NULL) {
+		rect.bottom = rect.bottom - (rect.Height() / 4);
+	}
 
+	dc.FillSolidRect(rect, RGB(235, 235, 235));
+
+	/*CPen pen1(PS_SOLID, 1, RGB(0, 0, 0));
+	CPen* oldPen = dc.SelectObject(&pen1);
 	dc.MoveTo(numberingFormRect.right, numberingFormRect.top);
-	dc.LineTo(numberingFormRect.right, numberingFormRect.bottom+1);
-	dc.LineTo(numberingFormRect.left, numberingFormRect.bottom+1);
+	dc.LineTo(numberingFormRect.right, numberingFormRect.bottom);
 
-	dc.SelectObject(oldPen);
+	dc.SelectObject(oldPen);*/
 }
 
 void CodeEditor::OnSize(UINT nType, int cx, int cy) {
@@ -145,8 +151,8 @@ void CodeEditor::OnSize(UINT nType, int cx, int cy) {
 		this->codeEditingForm->MoveWindow(rect);
 
 		rect.left -= CODENUMBERFORMWIDTH;
-		rect.right = rect.left + CODENUMBERFORMWIDTH - 5;
-		rect.bottom -= 26; //수평 스크롤 바 높이.
+		rect.right = rect.left + CODENUMBERFORMWIDTH - 2;
+		rect.bottom -= 25; //수평 스크롤 바 높이.
 		this->codeNumberingForm->MoveWindow(rect);
 	}
 

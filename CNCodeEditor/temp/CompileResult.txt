@@ -1,0 +1,12 @@
+C:\Users\kch79\Desktop\cncodeeditor.c: In function 'main':
+C:\Users\kch79\Desktop\cncodeeditor.c:8:32: error: expected ';' before 'int'
+    8 |  printf("Hello CNCodeEditor\n")
+      |                                ^
+      |                                ;
+    9 | 
+   10 |  int i = 1;
+      |  ~~~                            
+C:\Users\kch79\Desktop\cncodeeditor.c:11:9: error: 'i' undeclared (first use in this function)
+   11 |  while (i < 2) {
+      |         ^
+C:\Users\kch79\Desktop\cncodeeditor.c:11:9: note: each undeclared identifier is reported only once for each function it appears in

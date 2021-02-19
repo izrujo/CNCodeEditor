@@ -1009,7 +1009,8 @@ void CCompileCommand::Execute() {
 		this->codeEditor->codeEditingForm->MoveWindow(rect);
 
 		rect.left -= CODENUMBERFORMWIDTH;
-		rect.right = rect.left + CODENUMBERFORMWIDTH;
+		rect.right = rect.left + CODENUMBERFORMWIDTH - 2;
+		rect.bottom -= 25; //수평 스크롤 바 높이.
 		this->codeEditor->codeNumberingForm->MoveWindow(rect);
 
 		this->codeEditor->outputForm = new OutputForm(this->codeEditor, result, resultFileName);
@@ -1103,7 +1104,8 @@ void CLinkCommand::Execute() {
 		this->codeEditor->codeEditingForm->MoveWindow(rect);
 
 		rect.left -= CODENUMBERFORMWIDTH;
-		rect.right = rect.left + CODENUMBERFORMWIDTH;
+		rect.right = rect.left + CODENUMBERFORMWIDTH - 2;
+		rect.bottom -= 25; //수평 스크롤 바 높이.
 		this->codeEditor->codeNumberingForm->MoveWindow(rect);
 
 		this->codeEditor->outputForm = new OutputForm(this->codeEditor, result, resultFileName);

@@ -111,7 +111,8 @@ void OutputForm::OnClose() {
 	codeEditor->codeEditingForm->MoveWindow(rect);
 
 	rect.left -= CODENUMBERFORMWIDTH;
-	rect.right = rect.left + CODENUMBERFORMWIDTH;
+	rect.right = rect.left + CODENUMBERFORMWIDTH - 2;
+	rect.bottom -= 25; //수평 스크롤 바 높이.
 	codeEditor->codeNumberingForm->MoveWindow(rect);
 
 	codeEditor->outputForm = NULL;

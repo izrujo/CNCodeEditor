@@ -72,6 +72,48 @@ void CodeEditingForm::OnEditCommandRange(UINT uID) {
 			i--;
 		}
 	}
+
+	if (uID == IDCNT_EDIT_WRITE) {
+		if (this->GetCurrentCharacter() == VK_RETURN) {
+			Glyph* previousLine = this->note->GetAt(this->note->GetCurrent() - 1);
+			Glyph* previousCharacter = 0;
+			string previousContent;
+			if (previousLine->GetLength() > 0) {
+				previousCharacter = previousLine->GetAt(previousLine->GetLength() - 1);
+				previousContent = previousCharacter->GetContent();
+			}
+			Long count = 0;
+			Long i = 0;
+			Glyph* tab = previousLine->GetAt(i++);
+			while (i < previousLine->GetLength() && tab->GetContent() == "        ") {
+				count++;
+				tab = previousLine->GetAt(i++);
+			}
+
+			Long tabToInput = count + 1;
+			if (previousCharacter == 0 || previousContent == ";"
+				|| previousContent == "}" || previousContent == ")" || previousContent == "]" || previousContent == ">") {
+				tabToInput--;
+			}
+			i = 1;
+			while (i <= tabToInput) {
+				this->SendMessage(WM_CHAR, MAKEWPARAM(VK_TAB, 0));
+				i++;
+			}
+		}
+		else if (this->GetCurrentCharacter() == 125) {
+			Long previousColumn = this->current->GetCurrent() - 2;
+			if (previousColumn < 0) {
+				previousColumn++;
+			}
+			Glyph* previousCharacter = this->current->GetAt(previousColumn);
+			if (previousCharacter->GetContent() == "        ") {
+				this->current->Move(previousColumn);
+				this->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_EDIT_DELETE, 0));
+				this->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_MOVE_RIGHT, 0));
+			}
+		}
+	}
 }
 
 void CodeEditingForm::OnMoveCommandRange(UINT uID) {

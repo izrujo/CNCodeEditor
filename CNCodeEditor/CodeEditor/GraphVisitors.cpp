@@ -27,6 +27,8 @@ void GraphDrawingVisitor::Visit(WindowCaption* element) {
 	Long width = element->GetWidth();
 	Long height = element->GetHeight();
 
+	this->dc->FillSolidRect(x, y, width, height, RGB(255, 255, 255));
+
 	CPen pen(PS_SOLID, 2, RGB(0, 0, 0));
 	CPen* oldPen = this->dc->SelectObject(&pen);
 
