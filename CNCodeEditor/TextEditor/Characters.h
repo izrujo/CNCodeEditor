@@ -15,18 +15,25 @@ Recently Updated : 2019.05
 
 class Character : public Glyph {
 public:
-	Character();
+	Character(int color = 0x000000);
 	Character(const Character& source);
 	virtual ~Character() = 0;
 	Character& operator=(const Character& source);
 
+	virtual void Paint(int color);
 	virtual void Select(bool isSelected);
 
+	virtual int GetColor() const;
 	virtual bool GetIsSelected() const;
 	virtual void Accept(Visitor* visitor);
 protected:
+	int color;
 	bool isSelected;
 };
+
+inline int Character::GetColor() const {
+	return this->color;
+}
 
 inline bool Character::GetIsSelected() const {
 	return this->isSelected;

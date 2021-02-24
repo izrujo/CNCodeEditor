@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -165,6 +165,11 @@
     <ClInclude Include="CodeEditor\PrintJobManager.h" />
     <ClInclude Include="CodeEditor\PrintStateDialog.h" />
     <ClInclude Include="CodeEditor\resource.h" />
+    <ClInclude Include="CodeEditor\TokenFactory.h" />
+    <ClInclude Include="CodeEditor\TokenVisitors.h" />
+    <ClInclude Include="CodeEditor\Tokens.h" />
+    <ClInclude Include="CodeEditor\TokenBook.h" />
+    <ClInclude Include="CodeEditor\TokenList.h" />
     <ClInclude Include="CodeEditor\UIGraphFactory.h" />
     <ClInclude Include="CodeEditor\UIGraphs.h" />
     <ClInclude Include="TextEditor\Caret.h" />
@@ -227,6 +232,11 @@
     <ClCompile Include="CodeEditor\PrintingVisitor.cpp" />
     <ClCompile Include="CodeEditor\PrintJobManager.cpp" />
     <ClCompile Include="CodeEditor\PrintStateDialog.cpp" />
+    <ClCompile Include="CodeEditor\TokenFactory.cpp" />
+    <ClCompile Include="CodeEditor\TokenVisitors.cpp" />
+    <ClCompile Include="CodeEditor\Tokens.cpp" />
+    <ClCompile Include="CodeEditor\TokenBook.cpp" />
+    <ClCompile Include="CodeEditor\TokenList.cpp" />
     <ClCompile Include="CodeEditor\UIGraphFactory.cpp" />
     <ClCompile Include="CodeEditor\UIGraphs.cpp" />
     <ClCompile Include="TextEditor\Caret.cpp" />

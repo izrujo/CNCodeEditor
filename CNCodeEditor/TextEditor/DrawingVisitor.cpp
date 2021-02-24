@@ -75,6 +75,9 @@ void DrawingVisitor::Visit(Character* character) {
 	COLORREF oldColor = this->dc->GetTextColor();
 
 	string content = character->GetContent();
+	if (content == "\t") {
+		content = "        ";
+	}
 	bool isSelected = character->GetIsSelected();
 
 	Long x = 0;
@@ -91,9 +94,12 @@ void DrawingVisitor::Visit(Character* character) {
 	}
 
 	if (isSelected == true) {
-		oldBkColor = this->dc->SetBkColor(RGB(0, 0, 235));
+		oldBkColor = this->dc->SetBkColor(RGB(0, 155, 235));
 		oldColor = this->dc->SetTextColor(RGB(255, 255, 255));
 	}
+	
+	int color = character->GetColor();
+	this->dc->SetTextColor(color);
 
 	this->dc->TextOutA(this->x - x, this->y, content.c_str());
 	this->x += width;

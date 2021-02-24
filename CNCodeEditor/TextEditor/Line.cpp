@@ -65,7 +65,7 @@ Long Line::MovePreviousWord() {
 	while (this->current > 0 && (this->glyphs[this->current - 1]->GetContent())[0] != ' ') {
 		this->current--;
 	}
-
+	
 	return this->current;
 }
 

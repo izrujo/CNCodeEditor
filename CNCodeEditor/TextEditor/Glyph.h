@@ -32,6 +32,8 @@ public:
 	virtual bool IsFirst();
 	virtual bool IsLast();
 
+	virtual void Paint(int color); //character
+
 	virtual void UnselectAll();
 	virtual bool IsSelecting();
 	virtual string GetSelectedContent(Long start, Long end);
@@ -50,6 +52,7 @@ public:
 	virtual Long GetCapacity() const; //virtual
 	virtual Long GetLength() const; //virtual
 	virtual Long GetCurrent() const; //virtual
+	virtual int GetColor() const;
 	virtual bool GetIsSelected() const; //virtual 
 };
 

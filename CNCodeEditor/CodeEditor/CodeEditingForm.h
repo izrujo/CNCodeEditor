@@ -3,14 +3,21 @@
 
 #include "../TextEditor/TextEditingForm.h"
 
+class TokenBook;
+class TokenFactory;
+
 class CodeEditingForm : public TextEditingForm {
 public:
 	CodeEditingForm();
 	virtual int OnCreate(LPCREATESTRUCT lpCreateStruct);
 
 public:
+	TokenBook* tokenBook;
+	TokenFactory* tokenFactory;
+
 protected:
 	afx_msg void OnClose();
+	afx_msg void OnPaint();
 	afx_msg void OnEditCommandRange(UINT uID);
 	afx_msg void OnMoveCommandRange(UINT uID);
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);

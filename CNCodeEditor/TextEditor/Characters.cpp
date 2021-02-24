@@ -1,7 +1,8 @@
 #include "Characters.h"
 #include "Visitor.h"
 
-Character::Character() {
+Character::Character(int color) {
+	this->color = color;
 	this->isSelected = false;
 }
 
@@ -17,6 +18,10 @@ Character& Character::operator=(const Character& source) {
 	this->isSelected = source.isSelected;
 
 	return *this;
+}
+
+void Character::Paint(int color) {
+	this->color = color;
 }
 
 void Character::Select(bool isSelected) {
@@ -95,12 +100,13 @@ Glyph* SingleByteCharacter::Clone() {
 
 string SingleByteCharacter::GetContent() {
 	string content;
-	if (this->content != '\t') {
+	//if (this->content != '\t') {
 		content = this->content;
-	}
+	//}
+		/*
 	else {
 		content = "        ";
-	}
+	}*/
 
 	return content;
 }

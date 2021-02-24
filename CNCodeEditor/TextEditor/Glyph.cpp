@@ -74,6 +74,10 @@ bool Glyph::IsLast() {
 	return false;
 }
 
+void Glyph::Paint(int color) {
+
+}
+
 void Glyph::UnselectAll() {
 
 }
@@ -117,6 +121,10 @@ Long Glyph::GetLength() const {
 	return -1;
 }
 Long Glyph::GetCurrent() const {
+	return -1;
+}
+
+int Glyph::GetColor() const {
 	return -1;
 }
 

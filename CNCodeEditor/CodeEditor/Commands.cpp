@@ -1177,7 +1177,7 @@ void CLoadCommand::Execute() {
 		Long last = content.length();
 		Long index = content.find("main(");
 		Long rindex = content.rfind("int", index);
-		if (rindex != index) {
+		if (rindex != -1 && rindex <= index-4) {
 			rindex = content.rfind("return 0;", last);
 		}
 		else {

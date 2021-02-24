@@ -3,15 +3,20 @@
 #include "KeyActionFactory.h"
 #include "KeyActions.h"
 #include "CodeNumberingForm.h"
+#include "TokenVisitors.h"
+#include "TokenBook.h"
+#include "TokenFactory.h"
 
 #include "resource.h"
 
 #include "../TextEditor/Glyph.h"
+#include "../TextEditor/Font.h"
 #include "../TextEditor/resource.h"
 
 BEGIN_MESSAGE_MAP(CodeEditingForm, TextEditingForm)
 	ON_WM_CREATE()
 	ON_WM_CLOSE()
+	ON_WM_PAINT()
 	ON_COMMAND_RANGE(IDCNT_EDIT_WRITE, IDCNT_EDIT_REDO, OnEditCommandRange)
 	ON_COMMAND_RANGE(IDCNT_MOVE_LEFT, IDCNT_SELECTMOVE_CTRLEND, OnMoveCommandRange)
 	ON_WM_KEYDOWN()
@@ -22,17 +27,51 @@ END_MESSAGE_MAP()
 
 CodeEditingForm::CodeEditingForm()
 	: TextEditingForm() {
-
+	this->tokenBook = NULL;
+	this->tokenFactory = NULL;
 }
 
 int CodeEditingForm::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 	TextEditingForm::OnCreate(lpCreateStruct);
 
+	this->tokenFactory = new TokenFactory;
+
 	return 0;
 }
 
 void CodeEditingForm::OnClose() {
+	if (this->tokenBook != NULL) {
+		delete this->tokenBook;
+	}
+	if (this->tokenFactory != NULL) {
+		delete this->tokenFactory;
+	}
+
 	TextEditingForm::OnClose();
+}
+
+void CodeEditingForm::OnPaint() {
+	if (this->tokenBook != NULL) {
+		delete this->tokenBook;
+	}
+	this->tokenBook = new TokenBook;
+	Visitor* tokenMakingVisitor = new TokenMakingVisitor(this->tokenBook, this->tokenFactory);
+
+	this->note->Accept(tokenMakingVisitor);
+
+	if (tokenMakingVisitor != NULL) {
+		delete tokenMakingVisitor;
+	}
+
+	Visitor* tokenDrawingVisitor = new TokenDrawingVisitor(this->tokenBook);
+
+	this->note->Accept(tokenDrawingVisitor);
+
+	if (tokenDrawingVisitor != NULL) {
+		delete tokenDrawingVisitor;
+	}
+
+	TextEditingForm::OnPaint();
 }
 
 void CodeEditingForm::OnEditCommandRange(UINT uID) {
@@ -74,6 +113,7 @@ void CodeEditingForm::OnEditCommandRange(UINT uID) {
 	}
 
 	if (uID == IDCNT_EDIT_WRITE) {
+#if 0
 		if (this->GetCurrentCharacter() == VK_RETURN) {
 			Glyph* previousLine = this->note->GetAt(this->note->GetCurrent() - 1);
 			Glyph* previousCharacter = 0;
@@ -82,17 +122,19 @@ void CodeEditingForm::OnEditCommandRange(UINT uID) {
 				previousCharacter = previousLine->GetAt(previousLine->GetLength() - 1);
 				previousContent = previousCharacter->GetContent();
 			}
+
 			Long count = 0;
 			Long i = 0;
 			Glyph* tab = previousLine->GetAt(i++);
-			while (i < previousLine->GetLength() && tab->GetContent() == "        ") {
+			while (i < previousLine->GetLength() && tab->GetContent() == "\t") {
 				count++;
 				tab = previousLine->GetAt(i++);
 			}
 
 			Long tabToInput = count + 1;
 			if (previousCharacter == 0 || previousContent == ";"
-				|| previousContent == "}" || previousContent == ")" || previousContent == "]" || previousContent == ">") {
+				|| previousContent == "}" || previousContent == ")" || previousContent == "]" || previousContent == ">"
+				|| ) {
 				tabToInput--;
 			}
 			i = 1;
@@ -100,6 +142,19 @@ void CodeEditingForm::OnEditCommandRange(UINT uID) {
 				this->SendMessage(WM_CHAR, MAKEWPARAM(VK_TAB, 0));
 				i++;
 			}
+
+			Long currentColumn = this->current->GetCurrent();
+			if (currentColumn < this->current->GetLength()) {
+				Glyph* nextCharacter = this->current->GetAt(currentColumn);
+				if (nextCharacter->GetContent() == "}" && previousContent == "{") {
+					this->SendMessage(WM_CHAR, MAKEWPARAM(VK_RETURN, 0));
+					this->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_MOVE_UP, 0));
+				}
+			}
+		}
+		else if (this->GetCurrentCharacter() == 123) {
+			this->SendMessage(WM_CHAR, MAKEWPARAM(125, 0));
+			this->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_MOVE_LEFT, 0));
 		}
 		else if (this->GetCurrentCharacter() == 125) {
 			Long previousColumn = this->current->GetCurrent() - 2;
@@ -107,12 +162,13 @@ void CodeEditingForm::OnEditCommandRange(UINT uID) {
 				previousColumn++;
 			}
 			Glyph* previousCharacter = this->current->GetAt(previousColumn);
-			if (previousCharacter->GetContent() == "        ") {
+			if (previousCharacter->GetContent() == "\t") {
 				this->current->Move(previousColumn);
 				this->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_EDIT_DELETE, 0));
 				this->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_MOVE_RIGHT, 0));
 			}
 		}
+#endif
 	}
 }
 

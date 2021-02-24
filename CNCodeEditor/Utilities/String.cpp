@@ -1362,7 +1362,7 @@ Long String::Find(char(*characters), Long index) {
 	//count = this->length - (i + 1);
 	count = this->length - i;
 
-	while (i < this->length && count >= length && strncmp(this->front + j, characters, length) != 0) {
+	while (i < this->length && /*count >= length && */strncmp(this->front + j, characters, length) != 0) {
 		if (this->IsHangle(j)) {
 			j++;
 		}
@@ -1371,7 +1371,7 @@ Long String::Find(char(*characters), Long index) {
 		//count = this->length - ( i + 1);
 		count = this->length - i;
 	}
-	if (i < this->length && count >= length) {
+	if (i < this->length/* && count >= length*/) {
 		index = i;
 	}
 

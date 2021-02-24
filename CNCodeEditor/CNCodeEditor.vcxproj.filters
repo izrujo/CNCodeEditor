@@ -199,6 +199,21 @@
     <ClInclude Include="CodeEditor\KeyActions.h">
       <Filter>CodeEditor</Filter>
     </ClInclude>
+    <ClInclude Include="CodeEditor\TokenBook.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\TokenList.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\Tokens.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\TokenFactory.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEditor\TokenVisitors.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Utilities\Stack.cpp">
@@ -373,6 +388,21 @@
       <Filter>CodeEditor</Filter>
     </ClCompile>
     <ClCompile Include="CodeEditor\KeyActions.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\TokenBook.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\TokenList.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\Tokens.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\TokenFactory.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\TokenVisitors.cpp">
       <Filter>CodeEditor</Filter>
     </ClCompile>
   </ItemGroup>

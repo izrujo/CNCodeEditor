@@ -689,9 +689,9 @@ void CNTCopyBasicCommand::Execute() {
 				if (character->GetIsSelected()) {
 					column = j + 1;
 					characterContent = character->GetContent();
-					if (characterContent == "        ") {
+					/*if (characterContent == "        ") {
 						characterContent = '\t';
-					}
+					}*/
 					content += characterContent;
 				}
 				j++;
