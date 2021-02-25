@@ -5,6 +5,8 @@
 
 class TokenBook;
 class TokenFactory;
+class Block;
+class CodeInputHelper;
 
 class CodeEditingForm : public TextEditingForm {
 public:
@@ -14,6 +16,8 @@ public:
 public:
 	TokenBook* tokenBook;
 	TokenFactory* tokenFactory;
+	Block* root;
+	CodeInputHelper* codeInputHelper;
 
 protected:
 	afx_msg void OnClose();

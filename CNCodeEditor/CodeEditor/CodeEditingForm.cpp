@@ -6,6 +6,8 @@
 #include "TokenVisitors.h"
 #include "TokenBook.h"
 #include "TokenFactory.h"
+#include "Block.h"
+#include "CodeInputHelper.h"
 
 #include "resource.h"
 
@@ -29,12 +31,18 @@ CodeEditingForm::CodeEditingForm()
 	: TextEditingForm() {
 	this->tokenBook = NULL;
 	this->tokenFactory = NULL;
+	this->root = NULL;
+	this->codeInputHelper = NULL;
 }
 
 int CodeEditingForm::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 	TextEditingForm::OnCreate(lpCreateStruct);
 
 	this->tokenFactory = new TokenFactory;
+
+	this->root = new Block(0, 0, this->note->GetLength() - 1);
+
+	this->codeInputHelper = new CodeInputHelper(this);
 
 	return 0;
 }
@@ -45,6 +53,12 @@ void CodeEditingForm::OnClose() {
 	}
 	if (this->tokenFactory != NULL) {
 		delete this->tokenFactory;
+	}
+	if (this->root != NULL) {
+		delete this->root;
+	}
+	if (this->codeInputHelper != NULL) {
+		delete this->codeInputHelper;
 	}
 
 	TextEditingForm::OnClose();
@@ -112,43 +126,34 @@ void CodeEditingForm::OnEditCommandRange(UINT uID) {
 		}
 	}
 
+	this->codeInputHelper->Help();
 	if (uID == IDCNT_EDIT_WRITE) {
-#if 0
+		Long currentRow = this->note->GetCurrent();
 		if (this->GetCurrentCharacter() == VK_RETURN) {
-			Glyph* previousLine = this->note->GetAt(this->note->GetCurrent() - 1);
-			Glyph* previousCharacter = 0;
-			string previousContent;
-			if (previousLine->GetLength() > 0) {
-				previousCharacter = previousLine->GetAt(previousLine->GetLength() - 1);
-				previousContent = previousCharacter->GetContent();
-			}
-
-			Long count = 0;
-			Long i = 0;
-			Glyph* tab = previousLine->GetAt(i++);
-			while (i < previousLine->GetLength() && tab->GetContent() == "\t") {
-				count++;
-				tab = previousLine->GetAt(i++);
-			}
-
-			Long tabToInput = count + 1;
-			if (previousCharacter == 0 || previousContent == ";"
-				|| previousContent == "}" || previousContent == ")" || previousContent == "]" || previousContent == ">"
-				|| ) {
-				tabToInput--;
-			}
-			i = 1;
-			while (i <= tabToInput) {
-				this->SendMessage(WM_CHAR, MAKEWPARAM(VK_TAB, 0));
-				i++;
-			}
-
+			string afterContent = "";
 			Long currentColumn = this->current->GetCurrent();
 			if (currentColumn < this->current->GetLength()) {
-				Glyph* nextCharacter = this->current->GetAt(currentColumn);
-				if (nextCharacter->GetContent() == "}" && previousContent == "{") {
-					this->SendMessage(WM_CHAR, MAKEWPARAM(VK_RETURN, 0));
-					this->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_MOVE_UP, 0));
+				afterContent = this->current->GetAt(this->current->GetCurrent())->GetContent();
+			}
+			//Block* now = this->root->Find(currentRow);
+			Long i = 1;
+			if (afterContent == "}") {
+				while (i <= this->root->Find(currentRow)->GetLevel() - 1) {
+					this->SendMessage(WM_CHAR, MAKEWPARAM(VK_TAB, 0));
+					i++;
+				}
+				i = 1;
+				while (i <= this->root->Find(currentRow)->GetLevel()) {
+					this->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_MOVE_LEFT, 0));
+					i++;
+				}
+				this->SendMessage(WM_CHAR, MAKEWPARAM(VK_RETURN, 0));
+			}
+			else {
+				i = 1;
+				while (i <= this->root->Find(currentRow)->GetLevel()) {
+					this->SendMessage(WM_CHAR, MAKEWPARAM(VK_TAB, 0));
+					i++;
 				}
 			}
 		}
@@ -157,19 +162,11 @@ void CodeEditingForm::OnEditCommandRange(UINT uID) {
 			this->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_MOVE_LEFT, 0));
 		}
 		else if (this->GetCurrentCharacter() == 125) {
-			Long previousColumn = this->current->GetCurrent() - 2;
-			if (previousColumn < 0) {
-				previousColumn++;
-			}
-			Glyph* previousCharacter = this->current->GetAt(previousColumn);
-			if (previousCharacter->GetContent() == "\t") {
-				this->current->Move(previousColumn);
-				this->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_EDIT_DELETE, 0));
-				this->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_MOVE_RIGHT, 0));
-			}
+			this->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_MOVE_LEFT, 0));
 		}
-#endif
 	}
+
+
 }
 
 void CodeEditingForm::OnMoveCommandRange(UINT uID) {

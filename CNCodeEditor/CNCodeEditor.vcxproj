@@ -141,8 +141,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CodeEditor\Block.h" />
     <ClInclude Include="CodeEditor\Book.h" />
     <ClInclude Include="CodeEditor\CodeEditingForm.h" />
+    <ClInclude Include="CodeEditor\CodeInputHelper.h" />
     <ClInclude Include="CodeEditor\CodeNumberingForm.h" />
     <ClInclude Include="CodeEditor\CommandFactory.h" />
     <ClInclude Include="CodeEditor\Commands.h" />
@@ -209,8 +211,10 @@
     <ClInclude Include="Utilities\String.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CodeEditor\Block.cpp" />
     <ClCompile Include="CodeEditor\Book.cpp" />
     <ClCompile Include="CodeEditor\CodeEditingForm.cpp" />
+    <ClCompile Include="CodeEditor\CodeInputHelper.cpp" />
     <ClCompile Include="CodeEditor\CodeNumberingForm.cpp" />
     <ClCompile Include="CodeEditor\CommandFactory.cpp" />
     <ClCompile Include="CodeEditor\Commands.cpp" />
