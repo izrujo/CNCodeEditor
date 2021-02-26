@@ -40,6 +40,15 @@ int CodeEditingForm::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 
 	this->tokenFactory = new TokenFactory;
 
+	this->tokenBook = new TokenBook;
+	Visitor* tokenMakingVisitor = new TokenMakingVisitor(this->tokenBook, this->tokenFactory);
+
+	this->note->Accept(tokenMakingVisitor);
+
+	if (tokenMakingVisitor != NULL) {
+		delete tokenMakingVisitor;
+	}
+
 	this->root = new Block(0, 0, this->note->GetLength() - 1);
 
 	this->codeInputHelper = new CodeInputHelper(this);
@@ -65,18 +74,6 @@ void CodeEditingForm::OnClose() {
 }
 
 void CodeEditingForm::OnPaint() {
-	if (this->tokenBook != NULL) {
-		delete this->tokenBook;
-	}
-	this->tokenBook = new TokenBook;
-	Visitor* tokenMakingVisitor = new TokenMakingVisitor(this->tokenBook, this->tokenFactory);
-
-	this->note->Accept(tokenMakingVisitor);
-
-	if (tokenMakingVisitor != NULL) {
-		delete tokenMakingVisitor;
-	}
-
 	Visitor* tokenDrawingVisitor = new TokenDrawingVisitor(this->tokenBook);
 
 	this->note->Accept(tokenDrawingVisitor);
@@ -126,7 +123,19 @@ void CodeEditingForm::OnEditCommandRange(UINT uID) {
 		}
 	}
 
-	this->codeInputHelper->Help();
+	if (this->tokenBook != NULL) {
+		delete this->tokenBook;
+	}
+	this->tokenBook = new TokenBook;
+	Visitor* tokenMakingVisitor = new TokenMakingVisitor(this->tokenBook, this->tokenFactory);
+
+	this->note->Accept(tokenMakingVisitor);
+
+	if (tokenMakingVisitor != NULL) {
+		delete tokenMakingVisitor;
+	}
+
+	this->codeInputHelper->UpdateBlock();
 	if (uID == IDCNT_EDIT_WRITE) {
 		Long currentRow = this->note->GetCurrent();
 		if (this->GetCurrentCharacter() == VK_RETURN) {
@@ -157,16 +166,17 @@ void CodeEditingForm::OnEditCommandRange(UINT uID) {
 				}
 			}
 		}
-		else if (this->GetCurrentCharacter() == 123) {
+		else if (this->GetCurrentCharacter() == 123) { // {
+			this->codeInputHelper->CleanRow();
 			this->SendMessage(WM_CHAR, MAKEWPARAM(125, 0));
 			this->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_MOVE_LEFT, 0));
 		}
-		else if (this->GetCurrentCharacter() == 125) {
-			this->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_MOVE_LEFT, 0));
+		else if (this->GetCurrentCharacter() == 59) { // ;
+			this->codeInputHelper->CleanRow();
 		}
 	}
-
-
+	this->Notify();
+	this->Invalidate();
 }
 
 void CodeEditingForm::OnMoveCommandRange(UINT uID) {

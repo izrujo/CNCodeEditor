@@ -10,7 +10,8 @@ public:
 	~CodeInputHelper();
 	CodeInputHelper& operator=(const CodeInputHelper& source);
 
-	void Help();
+	void UpdateBlock();
+	void CleanRow();
 
 private:
 	CodeEditingForm* codeEditingForm;
