@@ -38,6 +38,7 @@ protected:
 	afx_msg void OnSimpleCommandRange(UINT uID);
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg LRESULT OnThreadNotify(WPARAM wParaml, LPARAM lParam);
+	//afx_msg void OnNcPaint();
 	//afx_msg void OnUpdateCommandUIRange(CCmdUI *pCmdUI);
 	DECLARE_MESSAGE_MAP()
 

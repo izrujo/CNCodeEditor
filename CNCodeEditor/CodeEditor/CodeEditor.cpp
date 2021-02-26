@@ -7,6 +7,8 @@
 #include "OutputForm.h"
 #include "CodeNumberingForm.h"
 #include "CodeEditingForm.h"
+#include "TokenBook.h"
+#include "TokenVisitors.h"
 
 #include "../TextEditor/Glyph.h"
 #include "../TextEditor/CharacterMetrics.h"
@@ -28,10 +30,11 @@ BEGIN_MESSAGE_MAP(CodeEditor, CFrameWnd)
 	ON_WM_SIZE()
 	ON_WM_SETFOCUS()
 	ON_WM_KILLFOCUS()
-	ON_COMMAND_RANGE(IDM_FILE_NEW, IDM_FORMAT_FONT, OnCommandRange)
+	ON_COMMAND_RANGE(IDM_FILE_NEW, IDM_FORMAT_THEMA, OnCommandRange)
 	ON_COMMAND_RANGE(IDM_FILE_CLOSE, IDC_REPORT_DIRTY, OnSimpleCommandRange)
 	ON_WM_KEYDOWN()
 	ON_MESSAGE(WM_THREADNOTIFY, OnThreadNotify)
+	ON_WM_NCPAINT()
 	//ON_UPDATE_COMMAND_UI_RANGE(IDM_FORMAT_WORDWRAP, IDM_FORMAT_WORDWRAP, OnUpdateCommandUIRange)
 END_MESSAGE_MAP()
 
@@ -68,7 +71,7 @@ int CodeEditor::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 
 	rect.left -= CODENUMBERFORMWIDTH;
 	rect.right = rect.left + CODENUMBERFORMWIDTH - 2;
-	rect.bottom -= 25; //수평 스크롤 바 높이.
+	rect.bottom -= 26; //수평 스크롤 바 높이.
 	this->codeNumberingForm = new CodeNumberingForm(this);
 	this->codeNumberingForm->Create(NULL, "CodeNumber", WS_CHILD,
 		rect, this, NULL, NULL);
@@ -76,7 +79,14 @@ int CodeEditor::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 	this->codeNumberingForm->UpdateWindow();
 
 	this->menu.LoadMenuA(IDR_MENU1);
-	this->SetMenu(&menu);
+	this->SetMenu(&this->menu);
+	MENUINFO menuInfo = {};
+	menuInfo.cbSize = sizeof(MENUINFO);
+	BOOL ret = this->menu.GetMenuInfo(&menuInfo);
+	DWORD error = GetLastError();
+	menuInfo.fMask = MIM_BACKGROUND;
+	menuInfo.hbrBack = ::CreateSolidBrush(RGB(30, 30, 30));
+	ret = this->menu.SetMenuInfo(&menuInfo);
 
 	this->document = new Document(this);
 
@@ -88,7 +98,6 @@ int CodeEditor::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 void CodeEditor::OnClose() {
 	if (this->outputForm != NULL) {
 		this->outputForm->SendMessage(WM_CLOSE);
-		delete this->outputForm;
 	}
 	if (this->codeEditingForm != NULL) {
 		delete this->codeEditingForm;
@@ -114,9 +123,6 @@ void CodeEditor::OnClose() {
 void CodeEditor::OnPaint() {
 	CPaintDC dc(this);
 
-	CRect numberingFormRect;
-	this->codeNumberingForm->GetClientRect(numberingFormRect);
-
 	CRect rect;
 	this->GetClientRect(rect);
 	if (this->outputForm != NULL) {
@@ -124,13 +130,6 @@ void CodeEditor::OnPaint() {
 	}
 
 	dc.FillSolidRect(rect, RGB(235, 235, 235));
-
-	/*CPen pen1(PS_SOLID, 1, RGB(0, 0, 0));
-	CPen* oldPen = dc.SelectObject(&pen1);
-	dc.MoveTo(numberingFormRect.right, numberingFormRect.top);
-	dc.LineTo(numberingFormRect.right, numberingFormRect.bottom);
-
-	dc.SelectObject(oldPen);*/
 }
 
 void CodeEditor::OnSize(UINT nType, int cx, int cy) {
@@ -152,7 +151,7 @@ void CodeEditor::OnSize(UINT nType, int cx, int cy) {
 
 		rect.left -= CODENUMBERFORMWIDTH;
 		rect.right = rect.left + CODENUMBERFORMWIDTH - 2;
-		rect.bottom -= 25; //수평 스크롤 바 높이.
+		rect.bottom -= 26; //수평 스크롤 바 높이.
 		this->codeNumberingForm->MoveWindow(rect);
 	}
 
@@ -176,6 +175,18 @@ void CodeEditor::OnCommandRange(UINT uID) {
 	if (command != NULL) {
 		command->Execute();
 		delete command;
+	}
+
+	if (this->codeEditingForm->tokenBook != NULL) {
+		delete this->codeEditingForm->tokenBook;
+	}
+	this->codeEditingForm->tokenBook = new TokenBook;
+	Visitor* tokenMakingVisitor = new TokenMakingVisitor(this->codeEditingForm->tokenBook, this->codeEditingForm->tokenFactory);
+
+	this->codeEditingForm->note->Accept(tokenMakingVisitor);
+
+	if (tokenMakingVisitor != NULL) {
+		delete tokenMakingVisitor;
 	}
 
 	if (this->codeEditingForm->scrollController != NULL) {

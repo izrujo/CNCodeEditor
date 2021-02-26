@@ -30,6 +30,7 @@ public:
 	HistoryBook* undoHistoryBook;
 	HistoryBook* redoHistoryBook;
 	FindReplaceDialog* findReplaceDialog;
+	COLORREF backgroundColor;
 protected:
 	afx_msg void OnClose();
 	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);

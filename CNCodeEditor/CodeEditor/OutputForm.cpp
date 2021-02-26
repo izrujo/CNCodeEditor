@@ -77,6 +77,18 @@ int OutputForm::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 
 	this->textEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_MOVE_CTRLEND, 0));
 
+	CodeEditor* codeEditor = static_cast<CodeEditor*>(this->parent);
+	this->textEditingForm->backgroundColor = codeEditor->codeEditingForm->backgroundColor;
+	LOGFONT logFont = codeEditor->codeEditingForm->font->GetFont();
+	COLORREF color = codeEditor->codeEditingForm->font->GetColor();
+	if (this->textEditingForm->font != NULL) {
+		delete this->textEditingForm->font;
+	}
+	this->textEditingForm->font = new Font(logFont, color, this->textEditingForm);
+	this->textEditingForm->note->Paint(color);
+
+	this->textEditingForm->SetWindowPos(this->textEditingForm, 0, 0, rect.Width(), rect.Height(), SWP_NOMOVE);
+
 	return 0;
 }
 
@@ -112,7 +124,7 @@ void OutputForm::OnClose() {
 
 	rect.left -= CODENUMBERFORMWIDTH;
 	rect.right = rect.left + CODENUMBERFORMWIDTH - 2;
-	rect.bottom -= 25; //수평 스크롤 바 높이.
+	rect.bottom -= 26; //수평 스크롤 바 높이.
 	codeEditor->codeNumberingForm->MoveWindow(rect);
 
 	codeEditor->outputForm = NULL;
@@ -123,6 +135,14 @@ void OutputForm::OnClose() {
 void OutputForm::OnPaint() {
 	CPaintDC dc(this);
 
+	COLORREF oldbkColor = dc.SetBkColor(RGB(0, 122, 204));
+	COLORREF oldTextColor = dc.SetTextColor(this->textEditingForm->font->GetColor());
+
+	CFont* oldFont;
+	CFont font;
+	this->textEditingForm->font->Create(font);
+	oldFont = dc.SelectObject(&font);
+
 	GraphVisitor* visitor = new GraphDrawingVisitor(&dc);
 	this->windowCaption->Accept(visitor);
 	this->windowCloseButton->Accept(visitor);
@@ -130,6 +150,9 @@ void OutputForm::OnPaint() {
 	if (visitor != NULL) {
 		delete visitor;
 	}
+
+	dc.SetBkColor(oldbkColor);
+	dc.SetTextColor(oldTextColor);
 }
 
 void OutputForm::OnSize(UINT nType, int cx, int cy) {
@@ -180,7 +203,7 @@ void OutputForm::AppendResult(string result, string resultFile) {
 
 	GlyphFactory glyphFactory;
 
-	Glyph* line= glyphFactory.Make("\r\n");
+	Glyph* line = glyphFactory.Make("\r\n");
 	this->textEditingForm->note->Add(line);
 	line = glyphFactory.Make("\r\n");
 	Long current = this->textEditingForm->note->Add(line);
@@ -200,5 +223,11 @@ void OutputForm::AppendResult(string result, string resultFile) {
 		scanner.Next();
 	}
 
+	this->textEditingForm->note->Paint(this->textEditingForm->font->GetColor());
+
 	this->textEditingForm->SendMessage(WM_COMMAND, MAKEWPARAM(IDCNT_MOVE_CTRLEND, 0));
+
+	CRect rect;
+	this->textEditingForm->GetClientRect(rect);
+	this->textEditingForm->SetWindowPos(this->textEditingForm, 0, 0, rect.Width(), rect.Height(), SWP_NOMOVE);
 }

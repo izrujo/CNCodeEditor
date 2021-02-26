@@ -167,6 +167,7 @@
     <ClInclude Include="CodeEditor\PrintJobManager.h" />
     <ClInclude Include="CodeEditor\PrintStateDialog.h" />
     <ClInclude Include="CodeEditor\resource.h" />
+    <ClInclude Include="CodeEditor\TokenColor.h" />
     <ClInclude Include="CodeEditor\TokenFactory.h" />
     <ClInclude Include="CodeEditor\TokenVisitors.h" />
     <ClInclude Include="CodeEditor\Tokens.h" />
@@ -236,6 +237,7 @@
     <ClCompile Include="CodeEditor\PrintingVisitor.cpp" />
     <ClCompile Include="CodeEditor\PrintJobManager.cpp" />
     <ClCompile Include="CodeEditor\PrintStateDialog.cpp" />
+    <ClCompile Include="CodeEditor\TokenColor.cpp" />
     <ClCompile Include="CodeEditor\TokenFactory.cpp" />
     <ClCompile Include="CodeEditor\TokenVisitors.cpp" />
     <ClCompile Include="CodeEditor\Tokens.cpp" />

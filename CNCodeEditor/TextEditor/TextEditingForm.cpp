@@ -58,6 +58,7 @@ TextEditingForm::TextEditingForm() {
 	this->undoHistoryBook = NULL;
 	this->redoHistoryBook = NULL;
 	this->findReplaceDialog = NULL;
+	this->backgroundColor = 0;
 
 	this->isComposing = FALSE;
 	this->currentCharacter = '\0';
@@ -91,6 +92,8 @@ int TextEditingForm::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 
 	this->undoHistoryBook = new HistoryBook(10);
 	this->redoHistoryBook = new HistoryBook(10);
+
+	this->backgroundColor = RGB(255, 255, 255);
 
 	Long index = this->note->Move(0);
 	this->current = this->note->GetAt(index);
@@ -182,7 +185,7 @@ void TextEditingForm::OnPaint() {
 	this->GetClientRect(&rect);
 	bitmap.CreateCompatibleBitmap(&dc, rect.Width(), rect.Height());
 	CBitmap* oldBitmap = memDC.SelectObject(&bitmap);
-	memDC.FillSolidRect(&rect, RGB(255, 255, 255));
+	memDC.FillSolidRect(&rect, this->backgroundColor);
 
 	CFont* oldFont;
 	COLORREF oldColor;

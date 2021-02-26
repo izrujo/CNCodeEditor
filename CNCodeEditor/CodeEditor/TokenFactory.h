@@ -13,7 +13,7 @@ typedef signed long int Long;
 
 class TokenFactory {
 public:
-	TokenFactory();
+	TokenFactory(bool isBright = true);
 	//TokenFactory(const TokenFactory& source);
 	~TokenFactory();
 
@@ -24,6 +24,7 @@ public:
 
 	void SetLiteralState(bool literalState);
 	void SetAnnotationState(bool annotationState);
+	void Brighten(bool isBright = true);
 
 	bool GetLiteralState() const;
 	bool GetAnnotationState() const;
@@ -37,6 +38,7 @@ private:
 
 	bool literalState;
 	bool annotationState;
+	bool isBright;
 };
 
 inline bool TokenFactory::GetLiteralState() const {

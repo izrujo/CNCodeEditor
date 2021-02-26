@@ -1,6 +1,7 @@
 #include "TokenFactory.h"
+#include "TokenColor.h"
 
-TokenFactory::TokenFactory() {
+TokenFactory::TokenFactory(bool isBright) {
 	Long i = 0;
 	this->dataTypes[i++] = "int";
 	this->dataTypes[i++] = "short";
@@ -76,6 +77,7 @@ TokenFactory::TokenFactory() {
 
 	this->literalState = false;
 	this->annotationState = false;
+	this->isBright = isBright;
 }
 
 //TokenFactory::TokenFactory(const TokenFactory& source) {
@@ -87,18 +89,26 @@ TokenFactory::~TokenFactory() {
 }
 
 Token* TokenFactory::Make(string content) {
+	TokenColor* tokenColor;
+	if (this->isBright == true) {
+		tokenColor = new TokenColor;
+	}
+	else {
+		tokenColor = new TokenColor(false);
+	}
+
 	Token* token = 0;
 	bool isMade = false;
 	Long length = content.length();
 	
 	if (this->annotationState == true && isMade == false) {
 		isMade = true;
-		token = new Annotation(content);
+		token = new Annotation(content, tokenColor->annotations);
 	}
 	
 	if (this->literalState == true && isMade == false) {
 		isMade = true;
-		token = new Literal(content);
+		token = new Literal(content, tokenColor->literals);
 	}
 
 	//리터럴이 아니고, 주석이 아니고, 
@@ -107,7 +117,7 @@ Token* TokenFactory::Make(string content) {
 	while (i < DATATYPESCOUNT && isMade == false) {
 		if (this->dataTypes[i] == content) {
 			isMade = true;
-			token = new DataType(content);
+			token = new DataType(content, tokenColor->dataTypes);
 		}
 		i++;
 	}
@@ -118,7 +128,7 @@ Token* TokenFactory::Make(string content) {
 	while (i < KEYWORDSCOUNT && isMade == false) {
 		if (this->keywords[i] == content) {
 			isMade = true;
-			token = new Keyword(content);
+			token = new Keyword(content, tokenColor->keywords);
 		}
 		i++;
 	}
@@ -129,7 +139,7 @@ Token* TokenFactory::Make(string content) {
 	while (i < PREPROCESSORSCOUNT && isMade == false) {
 		if (this->preprocessors[i] == content) {
 			isMade = true;
-			token = new Preprocessor(content);
+			token = new Preprocessor(content, tokenColor->preprocessors);
 		}
 		i++;
 	}
@@ -140,7 +150,7 @@ Token* TokenFactory::Make(string content) {
 	while (i < OPERATORSCOUNT && isMade == false) {
 		if (this->operators[i] == content) {
 			isMade = true;
-			token = new Operator(content);
+			token = new Operator(content, tokenColor->operators);
 		}
 		i++;
 	}
@@ -151,7 +161,7 @@ Token* TokenFactory::Make(string content) {
 	while (i < PUNCTUATIONSCOUNT && isMade == false) {
 		if (this->punctuations[i] == content) {
 			isMade = true;
-			token = new Punctuation(content);
+			token = new Punctuation(content, tokenColor->punctuations);
 		}
 		i++;
 	}
@@ -173,11 +183,15 @@ Token* TokenFactory::Make(string content) {
 	}
 	if (isMade == false && isHangle == false && (content.at(0) != ' ' && content.at(0) != '\t')) {
 		if (isUpper == 0) {
-			token = new Identifier(content);
+			token = new Identifier(content, tokenColor->identifiers);
 		}
 		else {
-			token = new SymbolicConstant(content);
+			token = new SymbolicConstant(content, tokenColor->symbolicConstants);
 		}
+	}
+
+	if (tokenColor != NULL) {
+		delete tokenColor;
 	}
 
 	return token;
@@ -215,4 +229,8 @@ void TokenFactory::SetLiteralState(bool literalState) {
 
 void TokenFactory::SetAnnotationState(bool annotationState) {
 	this->annotationState = annotationState;
+}
+
+void TokenFactory::Brighten(bool isBright) {
+	this->isBright = isBright;
 }

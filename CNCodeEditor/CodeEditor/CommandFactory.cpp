@@ -26,6 +26,9 @@ Command* CommandFactory::Make(int uID) {
 	if (uID == IDM_FORMAT_FONT) {
 		command = new FontCommand(this->codeEditor);
 	}
+	if (uID == IDM_FORMAT_THEMA) {
+		command = new ThemaCommand(this->codeEditor);
+	}
 	else if (uID == IDM_FILE_NEW) {
 		command = new NewCommand(this->codeEditor);
 	}

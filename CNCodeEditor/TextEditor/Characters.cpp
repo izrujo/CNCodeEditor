@@ -7,6 +7,7 @@ Character::Character(int color) {
 }
 
 Character::Character(const Character& source) {
+	this->color = source.color;
 	this->isSelected = source.isSelected;
 }
 
@@ -15,6 +16,7 @@ Character::~Character() {
 }
 
 Character& Character::operator=(const Character& source) {
+	this->color = source.color;
 	this->isSelected = source.isSelected;
 
 	return *this;
@@ -33,13 +35,13 @@ void Character::Accept(Visitor* visitor) {
 }
 
 //SingleByteCharacter
-SingleByteCharacter::SingleByteCharacter()
-	: Character() {
+SingleByteCharacter::SingleByteCharacter(int color)
+	: Character(color) {
 	this->content = '\0';
 }
 
-SingleByteCharacter::SingleByteCharacter(char content)
-	: Character() {
+SingleByteCharacter::SingleByteCharacter(char content, int color)
+	: Character(color) {
 	this->content = content;
 }
 
@@ -112,14 +114,14 @@ string SingleByteCharacter::GetContent() {
 }
 
 //DoubleByteCharacter
-DoubleByteCharacter::DoubleByteCharacter()
-	: Character() {
+DoubleByteCharacter::DoubleByteCharacter(int color)
+	: Character(color) {
 	this->content[0] = '\0';
 	this->content[1] = '\0';
 }
 
-DoubleByteCharacter::DoubleByteCharacter(const char(*content))
-	: Character() {
+DoubleByteCharacter::DoubleByteCharacter(const char(*content), int color)
+	: Character(color) {
 	this->content[0] = content[0];
 	this->content[1] = content[1];
 }

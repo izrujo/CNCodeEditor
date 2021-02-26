@@ -101,6 +101,14 @@ bool Line::IsLast() {
 	return isLast;
 }
 
+void Line::Paint(int color) {
+	Long i = 0;
+	while (i < this->length) {
+		this->glyphs[i]->Paint(color);
+		i++;
+	}
+}
+
 void Line::UnselectAll() {
 	Glyph* character;
 	Long i = 0;

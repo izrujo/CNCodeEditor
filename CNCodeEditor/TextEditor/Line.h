@@ -26,6 +26,8 @@ public:
 	virtual bool IsFirst();
 	virtual bool IsLast();
 
+	virtual void Paint(int color);
+
 	virtual void UnselectAll();
 	virtual bool IsSelecting();
 	virtual Long Select(Long start, Long end);

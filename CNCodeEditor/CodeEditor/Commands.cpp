@@ -15,6 +15,7 @@
 #include "OutputForm.h"
 #include "CodeNumberingForm.h"
 #include "CodeEditingForm.h"
+#include "TokenFactory.h"
 #include "../TextEditor/Font.h"
 #include "../TextEditor/CharacterMetrics.h"
 #include "../TextEditor/GlyphFactory.h"
@@ -89,11 +90,14 @@ void FontCommand::Execute() {
 	if (ret == IDOK) {
 		//폰트 대화 상자에서 폰트 정보를 가져온다.
 		fontDialog.GetCurrentFont(&logFont);
-		color = fontDialog.GetColor();
+		color = this->codeEditor->codeEditingForm->font->GetColor();
 		if (this->codeEditor->codeEditingForm->font != NULL) {
 			delete this->codeEditor->codeEditingForm->font;
 		}
-		this->codeEditor->codeEditingForm->font = new Font(logFont, color, this->codeEditor);
+		this->codeEditor->codeEditingForm->font = new Font(logFont, color, this->codeEditor->codeEditingForm);
+
+		this->codeEditor->codeEditingForm->note->Paint(color);
+
 		if (this->codeEditor->codeEditingForm->characterMetrics != NULL) {
 			delete this->codeEditor->codeEditingForm->characterMetrics;
 		}
@@ -135,6 +139,74 @@ string FontCommand::GetType() {
 
 Command* FontCommand::Clone() {
 	return new FontCommand(*this);
+}
+
+//ThemaCommand
+ThemaCommand::ThemaCommand(CodeEditor* codeEditor)
+	: Command(codeEditor) {
+}
+
+ThemaCommand::ThemaCommand(const ThemaCommand& source)
+	: Command(source) {
+
+}
+
+ThemaCommand::~ThemaCommand() {
+
+}
+
+ThemaCommand& ThemaCommand::operator=(const ThemaCommand& source) {
+	Command::operator=(source);
+
+	return *this;
+}
+
+void ThemaCommand::Execute() {
+	if (this->codeEditor->codeEditingForm->backgroundColor == RGB(255, 255, 255)) {
+		this->codeEditor->codeEditingForm->backgroundColor = RGB(30, 30, 30);
+
+		this->codeEditor->codeEditingForm->tokenFactory->Brighten(false);
+
+		LOGFONT logFont = this->codeEditor->codeEditingForm->font->GetFont();
+		if (this->codeEditor->codeEditingForm->font != NULL) {
+			delete this->codeEditor->codeEditingForm->font;
+		}
+		this->codeEditor->codeEditingForm->font = new Font(logFont, RGB(255, 255, 255), this->codeEditor->codeEditingForm);
+		this->codeEditor->codeEditingForm->note->Paint(RGB(255, 255, 255));
+	}
+	else if (this->codeEditor->codeEditingForm->backgroundColor == RGB(30, 30, 30)) {
+		this->codeEditor->codeEditingForm->backgroundColor = RGB(255, 255, 255);
+		
+		this->codeEditor->codeEditingForm->tokenFactory->Brighten(true);
+		
+		LOGFONT logFont = this->codeEditor->codeEditingForm->font->GetFont();
+		if (this->codeEditor->codeEditingForm->font != NULL) {
+			delete this->codeEditor->codeEditingForm->font;
+		}
+		this->codeEditor->codeEditingForm->font = new Font(logFont, RGB(0, 0, 0), this->codeEditor->codeEditingForm);
+		this->codeEditor->codeEditingForm->note->Paint(RGB(0, 0, 0));
+	}
+
+	MENUINFO menuInfo;
+	this->codeEditor->menu.GetMenuInfo(&menuInfo);
+	menuInfo.fMask |= MIM_BACKGROUND;
+	menuInfo.hbrBack = ::CreateSolidBrush(this->codeEditor->codeEditingForm->backgroundColor);
+	this->codeEditor->menu.SetMenuInfo(&menuInfo);
+
+	this->codeEditor->codeNumberingForm->Invalidate();
+
+	if (this->codeEditor->outputForm != NULL) {
+		this->codeEditor->outputForm->SendMessage(WM_CLOSE);
+		this->codeEditor->outputForm = NULL;
+	}
+}
+
+string ThemaCommand::GetType() {
+	return "Thema";
+}
+
+Command* ThemaCommand::Clone() {
+	return new ThemaCommand(*this);
 }
 
 //NewCommand
@@ -1010,7 +1082,7 @@ void CCompileCommand::Execute() {
 
 		rect.left -= CODENUMBERFORMWIDTH;
 		rect.right = rect.left + CODENUMBERFORMWIDTH - 2;
-		rect.bottom -= 25; //수평 스크롤 바 높이.
+		rect.bottom -= 26; //수평 스크롤 바 높이.
 		this->codeEditor->codeNumberingForm->MoveWindow(rect);
 
 		this->codeEditor->outputForm = new OutputForm(this->codeEditor, result, resultFileName);
@@ -1105,7 +1177,7 @@ void CLinkCommand::Execute() {
 
 		rect.left -= CODENUMBERFORMWIDTH;
 		rect.right = rect.left + CODENUMBERFORMWIDTH - 2;
-		rect.bottom -= 25; //수평 스크롤 바 높이.
+		rect.bottom -= 26; //수평 스크롤 바 높이.
 		this->codeEditor->codeNumberingForm->MoveWindow(rect);
 
 		this->codeEditor->outputForm = new OutputForm(this->codeEditor, result, resultFileName);

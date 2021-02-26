@@ -64,17 +64,22 @@ void CodeNumberingForm::OnPaint() {
 	CRect rect;
 	this->GetClientRect(rect);
 
-	dc.FillSolidRect(&rect, RGB(255, 255, 255));
-
 	CodeEditingForm* codeEditingForm = static_cast<CodeEditor*>(this->parent)->codeEditingForm;
+
+	dc.FillSolidRect(&rect, codeEditingForm->backgroundColor);
+
 	CFont* oldFont;
 	CFont font;
 	codeEditingForm->font->Create(font);
 	oldFont = dc.SelectObject(&font);
+	COLORREF textColor = codeEditingForm->font->GetColor();
+	COLORREF oldColor = dc.SetTextColor(textColor);
+
 
 	GraphVisitor* visitor = new GraphDrawingVisitor(&dc, codeEditingForm->scrollController);
 	this->numberStick->Accept(visitor);
 
+	dc.SetTextColor(oldColor);
 	dc.SelectObject(oldFont);
 
 	if (visitor != NULL) {

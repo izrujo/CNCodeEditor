@@ -95,7 +95,7 @@ void DrawingVisitor::Visit(Character* character) {
 
 	if (isSelected == true) {
 		oldBkColor = this->dc->SetBkColor(RGB(0, 155, 235));
-		oldColor = this->dc->SetTextColor(RGB(255, 255, 255));
+		//oldColor = this->dc->SetTextColor(RGB(255, 255, 255));
 	}
 	
 	int color = character->GetColor();

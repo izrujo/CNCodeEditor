@@ -220,6 +220,9 @@
     <ClInclude Include="CodeEditor\CodeInputHelper.h">
       <Filter>CodeEditor</Filter>
     </ClInclude>
+    <ClInclude Include="CodeEditor\TokenColor.h">
+      <Filter>CodeEditor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Utilities\Stack.cpp">
@@ -415,6 +418,9 @@
       <Filter>CodeEditor</Filter>
     </ClCompile>
     <ClCompile Include="CodeEditor\CodeInputHelper.cpp">
+      <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEditor\TokenColor.cpp">
       <Filter>CodeEditor</Filter>
     </ClCompile>
   </ItemGroup>

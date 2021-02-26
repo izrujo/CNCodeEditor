@@ -41,8 +41,8 @@ inline bool Character::GetIsSelected() const {
 
 class SingleByteCharacter : public Character {
 public:
-	SingleByteCharacter();
-	SingleByteCharacter(char content);
+	SingleByteCharacter(int color = 0x000000);
+	SingleByteCharacter(char content, int color = 0x000000);
 	SingleByteCharacter(const SingleByteCharacter& source);
 	virtual ~SingleByteCharacter();
 	SingleByteCharacter& operator=(const SingleByteCharacter& source);
@@ -66,8 +66,8 @@ inline char SingleByteCharacter::GetChar() const {
 
 class DoubleByteCharacter : public Character {
 public:
-	DoubleByteCharacter();
-	DoubleByteCharacter(const char(*content));
+	DoubleByteCharacter(int color = 0x000000);
+	DoubleByteCharacter(const char(*content), int color = 0x000000);
 	DoubleByteCharacter(const DoubleByteCharacter& source);
 	virtual ~DoubleByteCharacter();
 	DoubleByteCharacter& operator=(const DoubleByteCharacter& source);

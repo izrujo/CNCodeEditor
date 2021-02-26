@@ -50,6 +50,19 @@ public:
 	virtual Command* Clone();
 };
 
+//ThemaCoommand
+class ThemaCommand : public Command {
+public:
+	ThemaCommand(CodeEditor* codeEditor = 0);
+	ThemaCommand(const ThemaCommand& source);
+	~ThemaCommand();
+	ThemaCommand& operator=(const ThemaCommand& source);
+
+	virtual void Execute();
+	virtual string GetType();
+	virtual Command* Clone();
+};
+
 //NewCommand
 class NewCommand : public Command {
 public:

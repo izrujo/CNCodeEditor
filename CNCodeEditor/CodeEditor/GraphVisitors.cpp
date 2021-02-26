@@ -27,9 +27,12 @@ void GraphDrawingVisitor::Visit(WindowCaption* element) {
 	Long width = element->GetWidth();
 	Long height = element->GetHeight();
 
-	this->dc->FillSolidRect(x, y, width, height, RGB(255, 255, 255));
+	COLORREF bkColor = this->dc->GetBkColor();
+	COLORREF textColor = this->dc->GetTextColor();
 
-	CPen pen(PS_SOLID, 2, RGB(0, 0, 0));
+	this->dc->FillSolidRect(x, y, width, height, bkColor);
+
+	CPen pen(PS_SOLID, 2, textColor);
 	CPen* oldPen = this->dc->SelectObject(&pen);
 
 	this->dc->MoveTo(x, y);
@@ -55,7 +58,12 @@ void GraphDrawingVisitor::Visit(WindowCloseButton* element) {
 	float hhhWidth = width / 8.0F; //half of half of half of width
 	float hhhHeight = height / 8.0F;
 
-	CPen pen(PS_SOLID, 2, RGB(0, 0, 0));
+	COLORREF bkColor = this->dc->GetBkColor();
+	COLORREF textColor = this->dc->GetTextColor();
+
+	this->dc->FillSolidRect(x, y, width, height, bkColor);
+
+	CPen pen(PS_SOLID, 2, textColor);
 	CPen* oldPen = this->dc->SelectObject(&pen);
 
 	this->dc->MoveTo(x, y);

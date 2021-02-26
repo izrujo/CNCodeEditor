@@ -125,6 +125,16 @@ bool Note::IsLast() {
 	return isLast;
 }
 
+void Note::Paint(int color) {
+	Glyph* line;
+	Long i = 0;
+	while (i < this->length) {
+		line = this->glyphs[i];
+		line->Paint(color);
+		i++;
+	}
+}
+
 void Note::UnselectAll() {
 	Glyph* line;
 	Long i = 0;
