@@ -80,13 +80,13 @@ int CodeEditor::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 
 	this->menu.LoadMenuA(IDR_MENU1);
 	this->SetMenu(&this->menu);
-	MENUINFO menuInfo = {};
+	/*MENUINFO menuInfo = {};
 	menuInfo.cbSize = sizeof(MENUINFO);
 	BOOL ret = this->menu.GetMenuInfo(&menuInfo);
 	DWORD error = GetLastError();
 	menuInfo.fMask = MIM_BACKGROUND;
 	menuInfo.hbrBack = ::CreateSolidBrush(RGB(30, 30, 30));
-	ret = this->menu.SetMenuInfo(&menuInfo);
+	ret = this->menu.SetMenuInfo(&menuInfo);*/
 
 	this->document = new Document(this);
 
