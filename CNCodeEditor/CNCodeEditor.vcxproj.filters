@@ -22,9 +22,6 @@
     <ClInclude Include="Utilities\Stack.h">
       <Filter>Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="Utilities\String.h">
-      <Filter>Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="TextEditor\Caret.h">
       <Filter>TextEditor</Filter>
     </ClInclude>
@@ -223,12 +220,12 @@
     <ClInclude Include="CodeEditor\TokenColor.h">
       <Filter>CodeEditor</Filter>
     </ClInclude>
+    <ClInclude Include="Utilities\String.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Utilities\Stack.cpp">
-      <Filter>Utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="Utilities\String.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
     <ClCompile Include="TextEditor\Caret.cpp">
@@ -422,6 +419,9 @@
     </ClCompile>
     <ClCompile Include="CodeEditor\TokenColor.cpp">
       <Filter>CodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities\String.cpp">
+      <Filter>Utilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

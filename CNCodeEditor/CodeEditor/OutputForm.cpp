@@ -87,8 +87,6 @@ int OutputForm::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 	this->textEditingForm->font = new Font(logFont, color, this->textEditingForm);
 	this->textEditingForm->note->Paint(color);
 
-	this->textEditingForm->SetWindowPos(this->textEditingForm, 0, 0, rect.Width(), rect.Height(), SWP_NOMOVE);
-
 	return 0;
 }
 

@@ -40,6 +40,7 @@
 #include <direct.h>
 #include <dlgs.h>
 #include <winspool.h>
+#include <shlobj_core.h>
 
 #pragma warning(disable:4996)
 
@@ -176,9 +177,9 @@ void ThemaCommand::Execute() {
 	}
 	else if (this->codeEditor->codeEditingForm->backgroundColor == RGB(30, 30, 30)) {
 		this->codeEditor->codeEditingForm->backgroundColor = RGB(255, 255, 255);
-		
+
 		this->codeEditor->codeEditingForm->tokenFactory->Brighten(true);
-		
+
 		LOGFONT logFont = this->codeEditor->codeEditingForm->font->GetFont();
 		if (this->codeEditor->codeEditingForm->font != NULL) {
 			delete this->codeEditor->codeEditingForm->font;
@@ -1006,7 +1007,7 @@ CCompileCommand::CCompileCommand(const CCompileCommand& source)
 }
 
 CCompileCommand::~CCompileCommand() {
-	
+
 }
 
 CCompileCommand& CCompileCommand::operator=(const CCompileCommand& source) {
@@ -1038,30 +1039,68 @@ void CCompileCommand::Execute() {
 		cmd += " > outTemp.txt 2>&1";
 		system(cmd.c_str());*/
 
-		String fileName(pathName);
-		Long index = fileName.ReversedFind('\\');
-		fileName.Delete(0, index + 1);
-		char extension1[3] = ".c";
-		char extension2[3] = ".o";
-		fileName.Replace(extension1, extension2);
-		string objectName = fileName.GetString();
+		// 히든 디렉토리를 만든다.
+		BOOL ret;
+		string tempDirectory;
+		TCHAR szPath[MAX_PATH];
+		if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_COMMON_APPDATA, NULL, 0, szPath)))
+		{
+			tempDirectory = szPath;
+			tempDirectory += "\\CNCodeEditor";
+			_mkdir(tempDirectory.c_str());
+			ret = SetCurrentDirectory(tempDirectory.c_str());
+		}
+
+		// xxx.c xxx.o 추출
+		string sourceName(pathName);
+		char backslash[2] = "\\";
+		Long index = sourceName.rfind(backslash);
+		index++;
+		sourceName.erase(0, index);
+		string objectName(sourceName);
+		objectName.replace(objectName.length() - 1, objectName.length(), "o");
+		// .o 파일 (있으면) 삭제
 		string cmd = "del " + objectName;
 		system(cmd.c_str());
 
-		string resultFileName = "temp\\CompileResult.txt";
+		// c 파일을 연다. full\\path\\filename.c
+		FileFactory fileFactory;
+		File* file = fileFactory.MakeOpenFile(pathName);
+		this->codeEditor->document->SetEncodingType(file->GetType());
+		string content = file->Load();
+		if (file != 0) {
+			delete file;
+		}
 
-		cmd = "gcc -c " + pathName + " > " + resultFileName + " 2>&1"; //컴파일
+		// c 파일을 히든 디렉토리에 넣는다. (gcc 경로 해석 문제)
+		string tempSource = tempDirectory + "\\" + sourceName;
+		file = fileFactory.MakeSaveFile(tempSource, this->codeEditor->document->GetEncodingType());
+		file->Save(content);
+		if (file != 0) {
+			delete file;
+		}
+
+		string resultFileName = tempDirectory + "\\CompileResult.txt";
+
+		// 히든 디렉토리의 c 파일을 컴파일해서 CompileResult.txt에 리디렉션한다.
+		cmd = "gcc -c " + tempSource + " > " + resultFileName + " 2>&1"; //컴파일
 		system(cmd.c_str());
 
-		File* file = new AnsiFile(resultFileName); //FileFactory::MakeOpenFile에 오류가 있는 것 같다.ansi인데 utf16le로 읽어냄.
+		// CompileResult.txt 를 연다. 
+		file = new AnsiFile(resultFileName); //FileFactory::MakeOpenFile에 오류가 있는 것 같다.ansi인데 utf16le로 읽어냄.
 		this->codeEditor->document->SetEncodingType(file->GetType());
 		string result = file->Load();
+
+		result += "\r\n" + pathName + "\r\n";
+
 		index = result.find("error");
 		if (index == -1) {
 			result += "\r\nCompile Succeed.\r\n";
+			this->codeEditor->SetIsCompiled(TRUE);
 		}
 		else {
 			result += "\r\nCompile Failed.\r\n";
+			this->codeEditor->SetIsCompiled(FALSE);
 		}
 
 		if (file != 0) {
@@ -1091,7 +1130,7 @@ void CCompileCommand::Execute() {
 		this->codeEditor->outputForm->ShowWindow(SW_SHOW);
 		this->codeEditor->outputForm->UpdateWindow();
 
-		this->codeEditor->SetIsCompiled(TRUE);
+		//this->codeEditor->SetIsCompiled(TRUE);
 		this->codeEditor->SetIsLinked(FALSE);
 	}
 }
@@ -1129,17 +1168,27 @@ void CLinkCommand::Execute() {
 
 	string pathName = this->codeEditor->document->GetPathName();
 
-	String fileName(pathName);
-	Long index = fileName.ReversedFind('\\');
-	fileName.Delete(0, index + 1);
-	char extension1[3] = ".c";
-	char extension2[3] = ".o";
-	char extension3[5] = ".exe";
-	fileName.Replace(extension1, extension2);
-	string objectName = fileName.GetString();
-	fileName.Replace(extension2, extension3);
-	string exeName = fileName.GetString();
-	string resultFileName = "temp\\LinkResult.txt";
+	// xxx.c xxx.o 추출
+	string sourceName(pathName);
+	char backslash[2] = "\\";
+	Long index = sourceName.rfind(backslash);
+	index++;
+	sourceName.erase(0, index);
+	string objectName(sourceName);
+	objectName.replace(objectName.length() - 1, objectName.length(), "o");
+	string exeName(sourceName);
+	exeName.replace(exeName.length() - 1, exeName.length(), "exe");
+
+	string tempDirectory;
+	TCHAR szPath[MAX_PATH];
+	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_COMMON_APPDATA, NULL, 0, szPath)))
+	{
+		tempDirectory = szPath;
+		tempDirectory += "\\CNCodeEditor";
+		_mkdir(tempDirectory.c_str());
+	}
+
+	string resultFileName = tempDirectory + "\\LinkResult.txt";
 
 	string cmd = "gcc -o " + exeName + " " + objectName + " > " + resultFileName + " 2>&1";
 	system(cmd.c_str());
@@ -1232,24 +1281,39 @@ void CLoadCommand::Execute() {
 			this->codeEditor->SendMessage(WM_COMMAND, MAKEWPARAM(IDM_C_LINK, 0));
 		}
 
+		string tempDirectory;
+		TCHAR szPath[MAX_PATH];
+		if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_COMMON_APPDATA, NULL, 0, szPath)))
+		{
+			tempDirectory = szPath;
+			tempDirectory += "\\CNCodeEditor";
+			_mkdir(tempDirectory.c_str());
+		}
 
-		string tempDirectory = "temp\\";
+		// xxx.c xxx.o 추출
+		string sourceName(pathName);
+		char backslash[2] = "\\";
+		Long index = sourceName.rfind(backslash);
+		index++;
+		sourceName.erase(0, index);
 
-		//2.1. c 파일을 연다. full\\path\\filename.c
+		string tempSource = tempDirectory + "\\" + sourceName;
+
+		//2.1. 히든 디렉토리의 c 파일을 연다.
 		FileFactory fileFactory;
-		File* file = fileFactory.MakeOpenFile(pathName);
+		File* file = fileFactory.MakeOpenFile(tempSource);
 		this->codeEditor->document->SetEncodingType(file->GetType());
 		string content = file->Load();
 		if (file != 0) {
 			delete file;
 		}
 
-		//2.2. 파일을 수정한다. temp\\CNTemp.c
+		//2.2. 히든 디렉토리의 c파일을 수정한다.
 		//-main이 int로 시작하면 return 0;을 찾고 void면 가장 뒤의 }를 찾는다.
 		Long last = content.length();
-		Long index = content.find("main(");
+		index = content.find("main(");
 		Long rindex = content.rfind("int", index);
-		if (rindex != -1 && rindex <= index-4) {
+		if (rindex != -1 && rindex <= index - 4) {
 			rindex = content.rfind("return 0;", last);
 		}
 		else {
@@ -1265,7 +1329,6 @@ void CLoadCommand::Execute() {
 		//printf("This process exited with code 0.\n");\n
 		//printf("Press any key to close this window . . . ");\n
 		//getch();\n
-		string tempSource = tempDirectory + "CNTemp.c";
 		file = fileFactory.MakeSaveFile(tempSource, this->codeEditor->document->GetEncodingType());
 		file->Save(content);
 		if (file != 0) {

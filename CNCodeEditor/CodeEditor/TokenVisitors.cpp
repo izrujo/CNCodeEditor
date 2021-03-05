@@ -27,7 +27,6 @@ TokenMakingVisitor::~TokenMakingVisitor() {
 void TokenMakingVisitor::Visit(Note* note) {
 	TokenList* list;
 	Glyph* line;
-	Token* token;
 
 	Long i = 0;
 	while (i < note->GetLength()) {

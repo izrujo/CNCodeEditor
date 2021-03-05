@@ -4,6 +4,8 @@
 #include "Selection.h"
 #include "DummyManager.h"
 
+#include "../Utilities/String.h"
+
 FindReplaceDialog::FindReplaceDialog(BOOL findOnly, string findWhat, CWnd* parent)
 	: CFindReplaceDialog() {
 	(findOnly == TRUE) ? (this->m_fr.lpTemplateName = MAKEINTRESOURCE(IDF)) : (this->m_fr.lpTemplateName = MAKEINTRESOURCE(IDR));
@@ -71,7 +73,7 @@ BOOL FindReplaceDialog::Find() {
 		myFindString.MakeLower();
 	}
 
-	//String 에서의 캐럿위치 찾기
+	//String 에서의 캐럿위치 찾기 : 한글은 2개로 센다.
 	Long current = 0;
 	Long lineLength;
 	Long i = 0;
@@ -127,6 +129,8 @@ BOOL FindReplaceDialog::Find() {
 			this->textEditingForm->selection = NULL;
 			this->textEditingForm->note->UnselectAll();
 		}
+
+		// current는 한글을 2로 센 인덱스이므로 
 
 		//Glyph 상 위치 구하고 이동하기
 		if (isSearchDown == FALSE) {

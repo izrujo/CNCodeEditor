@@ -3,9 +3,11 @@
 
 #include "TextEditingForm.h"
 #include "resource.h"
-#include "../Utilities/String.h"
 
 #include <afxdlgs.h>
+#include <string>
+
+using namespace std;
 
 class FindReplaceDialog : public CFindReplaceDialog {
 public:

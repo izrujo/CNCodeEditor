@@ -85,7 +85,7 @@ Long DummyManager::Fold(Long unfoldedRow) {
 	Glyph* line = this->note->GetAt(unfoldedRow);
 	Long length = line->GetLength();
 	Long lineWidth = this->characterMetrics->GetX(line, length);
-	while (lineWidth > this->width) {
+	while (lineWidth > this->width && this->width > 0) {
 		count = 0;
 		cutColumn = this->characterMetrics->GetColumn(line, this->width);
 		character = line->GetAt(cutColumn);

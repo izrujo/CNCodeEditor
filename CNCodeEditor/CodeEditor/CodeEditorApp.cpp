@@ -1,3 +1,4 @@
+#include <vld.h>
 #include "CodeEditorApp.h"
 #include "CodeEditor.h"
 
